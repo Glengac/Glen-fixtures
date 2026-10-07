@@ -9,11 +9,11 @@ REFRESH-INTERVAL;VALUE=DURATION:PT12H
 X-PUBLISHED-TTL:PT12H
 BEGIN:VEVENT
 UID:2026-08-05-cam-loup@glen-fixtures
-DTSTAMP:20261007T231641Z
+DTSTAMP:20261007T232156Z
 DTSTART:20260805T180000Z
 DTEND:20260805T193000Z
 SUMMARY:Glen 3-10 v 0-6 Loup (Junior Camogie)
-DESCRIPTION:Seconds/Junior Camogie League · Round 9\nFrom Derry GAA. Check
-  for time or venue changes.
+DESCRIPTION:Seconds/Junior Camogie League · Round 9\nCheck for time or ven
+ ue changes before you travel.
 END:VEVENT
 END:VCALENDAR

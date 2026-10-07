@@ -9,52 +9,52 @@ REFRESH-INTERVAL;VALUE=DURATION:PT12H
 X-PUBLISHED-TTL:PT12H
 BEGIN:VEVENT
 UID:2026-08-02-rf-faughanvale@glen-fixtures
-DTSTAMP:20261007T231641Z
+DTSTAMP:20261007T232156Z
 DTSTART:20260802T120000Z
 DTEND:20260802T133000Z
 SUMMARY:Glen 0-13 v 1-14 Faughanvale (Reserve Football)
-DESCRIPTION:Division 1 Reserve Football League · Round 14\nFrom Derry GAA.
-  Check for time or venue changes.
+DESCRIPTION:Division 1 Reserve Football League · Round 14\nCheck for time 
+ or venue changes before you travel.
 LOCATION:Faughanvale
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-08-17-rf-steelstown@glen-fixtures
-DTSTAMP:20261007T231641Z
+DTSTAMP:20261007T232156Z
 DTSTART;VALUE=DATE:20260817
 DTEND;VALUE=DATE:20260818
 SUMMARY:Glen v Steelstown (Reserve Football) – walkover
-DESCRIPTION:Division 1 Reserve Football League · Round 4\nFrom Derry GAA. 
- Check for time or venue changes.
+DESCRIPTION:Division 1 Reserve Football League · Round 4\nCheck for time o
+ r venue changes before you travel.
 LOCATION:Steelstown
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-09-07-rf-newbridge@glen-fixtures
-DTSTAMP:20261007T231641Z
+DTSTAMP:20261007T232156Z
 DTSTART:20260907T183000Z
 DTEND:20260907T200000Z
 SUMMARY:Glen 2-22 v 2-13 Newbridge (Reserve Football)
-DESCRIPTION:Oakleaf Senior Reserve Football Championship · Round 1\nFrom D
- erry GAA. Check for time or venue changes.
+DESCRIPTION:Oakleaf Senior Reserve Football Championship · Round 1\nCheck 
+ for time or venue changes before you travel.
 LOCATION:Watty Graham Park\, Maghera
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-09-28-rf-ballinderry@glen-fixtures
-DTSTAMP:20261007T231641Z
+DTSTAMP:20261007T232156Z
 DTSTART:20260928T183000Z
 DTEND:20260928T200000Z
 SUMMARY:Glen 1-14 v 0-13 Ballinderry (Reserve Football)
 DESCRIPTION:Oakleaf Senior Reserve Football Championship · Quarter-final\n
- From Derry GAA. Check for time or venue changes.
+ Check for time or venue changes before you travel.
 LOCATION:Watty Graham Park\, Maghera
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-10-05-rf-bellaghy@glen-fixtures
-DTSTAMP:20261007T231641Z
+DTSTAMP:20261007T232156Z
 DTSTART:20261005T183000Z
 DTEND:20261005T200000Z
 SUMMARY:Glen 1-15 v 2-13 Bellaghy (Reserve Football)
-DESCRIPTION:Oakleaf Senior Reserve Football Championship · Semi-final\nFro
- m Derry GAA. Check for time or venue changes.
+DESCRIPTION:Oakleaf Senior Reserve Football Championship · Semi-final\nChe
+ ck for time or venue changes before you travel.
 LOCATION:Bellaghy
 END:VEVENT
 END:VCALENDAR

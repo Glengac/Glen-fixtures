@@ -96,6 +96,7 @@
     if (a == null || b == null) return null;
     return a > b ? "w" : a < b ? "l" : "d";
   }
+  function compLine(g) { return g.comp + (g.round ? " · " + g.round : ""); }
   function isFinal(g) { return /(^|· )Final$/.test(g.round || ""); }
   function mapsQuery(venue) { return !venue || venue === "TBC" ? null : (VENUE_QUERY[venue] || venue + " GAC"); }
   function mapsLink(venue) {
@@ -110,7 +111,7 @@
     const end = new Date(start.getTime() + 90 * 60000);
     const gfmt = function (d) { return d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, ""); };
     const title = "Glen v " + g.opp + " (" + teamName(g.team) + ")";
-    const details = g.comp + " · " + g.round + "\nFixture from Derry GAA. Check for time or venue changes.";
+    const details = compLine(g) + "\nCheck for time or venue changes before you travel.";
     const loc = mapsQuery(g.venue) || "";
     return {
       google: "https://calendar.google.com/calendar/render?action=TEMPLATE&text=" + encodeURIComponent(title) +
@@ -189,7 +190,12 @@
   }
   function lineupFor(team) { return (LIVE.lineups && LIVE.lineups[team]) || {}; }
   /* Derry GAA fixtures plus games the club adds itself (Ulster club, LGFA, challenge games) */
-  function allGames() { return DATA.games.concat(LIVE.extra || []); }
+  function allGames() {
+    const key = function (g) { return g.d + "|" + String(g.opp || "").trim().toLowerCase(); };
+    const official = {};
+    DATA.games.forEach(function (g) { official[key(g)] = true; });
+    return DATA.games.concat((LIVE.extra || []).filter(function (g) { return !official[key(g)]; }));
+  }
   function normaliseLive(v) {
     v = v || {};
     let m = v.match || null;
@@ -288,7 +294,7 @@
     const cal = calLinks(g);
     return '<article class="game"><div class="body">' + eyebrow(g, false) +
       '<h3>Glen <span class="v">v</span> ' + esc(g.opp) + "</h3>" +
-      '<p class="comp">' + esc(g.comp) + " · " + esc(g.round) + "</p>" +
+      '<p class="comp">' + esc(compLine(g)) + "</p>" +
       '<p class="meta"><time>' + esc(g.t || "Time TBC") + '</time><span aria-hidden="true">·</span>' + mapsLink(g.venue) +
       ' <span class="chip ha">' + HA[g.ha] + "</span></p>" +
       (cal ? '<p class="cal">Add to calendar: <a href="' + esc(cal.google) + '" target="_blank" rel="noopener">Google</a><a href="' + esc(cal.outlook) + '" target="_blank" rel="noopener">Outlook</a></p>' : "") +
@@ -307,7 +313,7 @@
     } else score = '<div class="score"><span class="pending">Result to come</span></div>';
     return '<article class="game"><div class="body">' + eyebrow(g, true) +
       '<h3>Glen <span class="v">v</span> ' + esc(g.opp) + "</h3>" +
-      '<p class="comp">' + esc(g.comp) + " · " + esc(g.round) + "</p>" +
+      '<p class="comp">' + esc(compLine(g)) + "</p>" +
       '<p class="meta">' + (g.t ? "<time>" + esc(g.t) + '</time><span aria-hidden="true">·</span>' : "") + mapsLink(g.venue) +
       ' <span class="chip ha">' + HA[g.ha] + "</span>" +
       (g.note ? '<span aria-hidden="true">·</span><span>' + esc(g.note) + "</span>" : "") + "</p>" +
@@ -339,7 +345,7 @@
       '<p class="team">' + esc(teamName(g.team)) + " · " + HA[g.ha] + "</p>" +
       '<h2 class="matchup">Glen<span class="v">v</span>' + esc(g.opp) + "</h2>" +
       '<p class="when">' + esc(g.t || "Time TBC") + " <span>· " + esc(fmtDate(g.d, { weekday: "long", day: "numeric", month: "long" })) + "</span></p>" +
-      '<p class="comp">' + esc(g.comp) + " · " + esc(g.round) + " · " + esc(g.venue === "TBC" ? "Venue TBC" : g.venue) + "</p>" +
+      '<p class="comp">' + esc(compLine(g)) + " · " + esc(g.venue === "TBC" ? "Venue TBC" : g.venue) + "</p>" +
       '<div class="actions">' +
       (cal ? '<a class="btn primary" href="' + esc(cal.google) + '" target="_blank" rel="noopener">Add to Google Calendar</a>' +
         '<a class="btn" href="' + esc(cal.outlook) + '" target="_blank" rel="noopener">Outlook</a>' : "") +

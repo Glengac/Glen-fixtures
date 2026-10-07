@@ -42,11 +42,6 @@
    "group": "Football"
   },
   {
-   "id": "sl",
-   "name": "Senior Ladies",
-   "group": "Ladies football"
-  },
-  {
    "id": "int",
    "name": "Intermediate Ladies",
    "group": "Ladies football"
@@ -87,6 +82,17 @@
    "opp": "Steelstown",
    "venue": "Watty Graham Park",
    "ha": "H",
+   "st": "fixture"
+  },
+  {
+   "d": "2026-10-11",
+   "t": "11:30",
+   "team": "int",
+   "comp": "Ulster LGFA Intermediate Club Championship",
+   "round": "",
+   "opp": "Burren",
+   "venue": "TBC",
+   "ha": "A",
    "st": "fixture"
   },
   {

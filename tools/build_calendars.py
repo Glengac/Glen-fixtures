@@ -49,7 +49,8 @@ def event_lines(g, team_name, stamp):
         title = f"Glen {g['us']} v {g['them']} {g['opp']} ({team_name})"
     elif g.get("st") == "walkover":
         title = f"Glen v {g['opp']} ({team_name}) – walkover"
-    desc = f"{g['comp']} · {g['round']}\nFrom Derry GAA. Check for time or venue changes."
+    comp = g['comp'] + (f" · {g['round']}" if g.get('round') else "")
+    desc = f"{comp}\nCheck for time or venue changes before you travel."
     loc = "" if g.get("venue") in (None, "", "TBC") else VENUE_QUERY.get(g["venue"], g["venue"])
     uid = f"{g['d']}-{g['team']}-{slug(g['opp'])}@glen-fixtures"
     lines = ["BEGIN:VEVENT", f"UID:{uid}", f"DTSTAMP:{stamp}"]

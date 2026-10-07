@@ -9,32 +9,32 @@ REFRESH-INTERVAL;VALUE=DURATION:PT12H
 X-PUBLISHED-TTL:PT12H
 BEGIN:VEVENT
 UID:2026-07-28-u14c-glack@glen-fixtures
-DTSTAMP:20261007T231641Z
+DTSTAMP:20261007T232156Z
 DTSTART:20260728T180000Z
 DTEND:20260728T193000Z
 SUMMARY:Glen 6-8 v 4-7 Glack (U14 Football C)
-DESCRIPTION:HSF Group U14C Football Championship · Group 3 · Round 1\nFro
- m Derry GAA. Check for time or venue changes.
+DESCRIPTION:HSF Group U14C Football Championship · Group 3 · Round 1\nChe
+ ck for time or venue changes before you travel.
 LOCATION:Watty Graham Park\, Maghera
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-08-11-u14c-doire-colmcille@glen-fixtures
-DTSTAMP:20261007T231641Z
+DTSTAMP:20261007T232156Z
 DTSTART:20260811T180000Z
 DTEND:20260811T193000Z
 SUMMARY:Glen 7-17 v 1-2 Doire Colmcille (U14 Football C)
-DESCRIPTION:HSF Group U14C Football Championship · Group 3 · Round 3\nFro
- m Derry GAA. Check for time or venue changes.
+DESCRIPTION:HSF Group U14C Football Championship · Group 3 · Round 3\nChe
+ ck for time or venue changes before you travel.
 LOCATION:Doire Colmcille
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-08-18-u14c-sean-dolans@glen-fixtures
-DTSTAMP:20261007T231641Z
+DTSTAMP:20261007T232156Z
 DTSTART:20260818T180000Z
 DTEND:20260818T193000Z
 SUMMARY:Glen 2-8 v 4-6 Sean Dolans (U14 Football C)
-DESCRIPTION:HSF Group U14C Football Championship · Quarter-final\nFrom Der
- ry GAA. Check for time or venue changes.
+DESCRIPTION:HSF Group U14C Football Championship · Quarter-final\nCheck fo
+ r time or venue changes before you travel.
 LOCATION:Watty Graham Park\, Maghera
 END:VEVENT
 END:VCALENDAR

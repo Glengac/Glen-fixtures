@@ -9,12 +9,12 @@ REFRESH-INTERVAL;VALUE=DURATION:PT12H
 X-PUBLISHED-TTL:PT12H
 BEGIN:VEVENT
 UID:2026-08-22-u14l-magherafelt@glen-fixtures
-DTSTAMP:20261007T231641Z
+DTSTAMP:20261007T232156Z
 DTSTART:20260822T180000Z
 DTEND:20260822T193000Z
 SUMMARY:Glen 4-11 v 11-7 Magherafelt (U14 Ladies)
-DESCRIPTION:U14 Championship · Cup Division 2 · Final\nFrom Derry GAA. Ch
- eck for time or venue changes.
+DESCRIPTION:U14 Championship · Cup Division 2 · Final\nCheck for time or 
+ venue changes before you travel.
 LOCATION:Magherafelt
 END:VEVENT
 END:VCALENDAR

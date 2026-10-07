@@ -9,42 +9,42 @@ REFRESH-INTERVAL;VALUE=DURATION:PT12H
 X-PUBLISHED-TTL:PT12H
 BEGIN:VEVENT
 UID:2026-07-27-mf-banagher@glen-fixtures
-DTSTAMP:20261007T231641Z
+DTSTAMP:20261007T232156Z
 DTSTART:20260727T180000Z
 DTEND:20260727T193000Z
 SUMMARY:Glen 2-15 v 1-6 Banagher (Minor Football)
 DESCRIPTION:O'Neills U18A1/A2 Football Championship · Group 1 · Round 1\n
- From Derry GAA. Check for time or venue changes.
+ Check for time or venue changes before you travel.
 LOCATION:Watty Graham Park\, Maghera
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-08-03-mf-ballinderry@glen-fixtures
-DTSTAMP:20261007T231641Z
+DTSTAMP:20261007T232156Z
 DTSTART:20260803T180000Z
 DTEND:20260803T193000Z
 SUMMARY:Glen 0-14 v 4-17 Ballinderry (Minor Football)
 DESCRIPTION:O'Neills U18A1/A2 Football Championship · Group 1 · Round 2\n
- From Derry GAA. Check for time or venue changes.
+ Check for time or venue changes before you travel.
 LOCATION:Watty Graham Park\, Maghera
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-08-10-mf-desertmartin@glen-fixtures
-DTSTAMP:20261007T231641Z
+DTSTAMP:20261007T232156Z
 DTSTART:20260810T180000Z
 DTEND:20260810T193000Z
 SUMMARY:Glen 5-15 v 1-13 Desertmartin (Minor Football)
 DESCRIPTION:O'Neills U18A1/A2 Football Championship · Group 1 · Round 3\n
- From Derry GAA. Check for time or venue changes.
+ Check for time or venue changes before you travel.
 LOCATION:Desertmartin
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-08-17-mf-magherafelt@glen-fixtures
-DTSTAMP:20261007T231641Z
+DTSTAMP:20261007T232156Z
 DTSTART:20260817T191500Z
 DTEND:20260817T204500Z
 SUMMARY:Glen 0-12 v 7-14 Magherafelt (Minor Football)
-DESCRIPTION:O'Neills U18A1 Football Championship · Quarter-final\nFrom Der
- ry GAA. Check for time or venue changes.
+DESCRIPTION:O'Neills U18A1 Football Championship · Quarter-final\nCheck fo
+ r time or venue changes before you travel.
 LOCATION:Magherafelt
 END:VEVENT
 END:VCALENDAR
