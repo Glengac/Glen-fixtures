@@ -1,0 +1,30 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Glen fixtures//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Glen · Minor Ladies
+X-WR-TIMEZONE:Europe/London
+REFRESH-INTERVAL;VALUE=DURATION:PT12H
+X-PUBLISHED-TTL:PT12H
+BEGIN:VEVENT
+UID:2026-08-03-mlf-greenlough@glen-fixtures
+DTSTAMP:20261007T224550Z
+DTSTART:20260803T183000Z
+DTEND:20260803T200000Z
+SUMMARY:Glen 1-15 v 3-4 Greenlough (Minor Ladies)
+DESCRIPTION:Minor Championship · Cup Division 2 · Quarter-final\nFrom Der
+ ry GAA. Check for time or venue changes.
+LOCATION:Watty Graham Park\, Maghera
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-08-08-mlf-eoghan-rua@glen-fixtures
+DTSTAMP:20261007T224550Z
+DTSTART:20260808T103000Z
+DTEND:20260808T120000Z
+SUMMARY:Glen 2-4 v 2-14 Eoghan Rua (Minor Ladies)
+DESCRIPTION:Minor Championship · Cup Division 2 · Semi-final\nFrom Derry 
+ GAA. Check for time or venue changes.
+LOCATION:Coleraine
+END:VEVENT
+END:VCALENDAR

@@ -1,0 +1,40 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Glen fixtures//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Glen · U14 Ladies 2
+X-WR-TIMEZONE:Europe/London
+REFRESH-INTERVAL;VALUE=DURATION:PT12H
+X-PUBLISHED-TTL:PT12H
+BEGIN:VEVENT
+UID:2026-07-31-u14l2-slaughtneil@glen-fixtures
+DTSTAMP:20261007T224550Z
+DTSTART:20260731T183000Z
+DTEND:20260731T200000Z
+SUMMARY:Glen 7-5 v 9-3 Slaughtneil (U14 Ladies 2)
+DESCRIPTION:U14 Championship · Cup Division 5 · Quarter-final\nFrom Derry
+  GAA. Check for time or venue changes.
+LOCATION:Watty Graham Park\, Maghera
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-08-13-u14l2-dungiven@glen-fixtures
+DTSTAMP:20261007T224550Z
+DTSTART:20260813T183000Z
+DTEND:20260813T200000Z
+SUMMARY:Glen 6-12 v 5-1 Dungiven (U14 Ladies 2)
+DESCRIPTION:U14 Championship · Cup Division 5 · Preliminary\nFrom Derry G
+ AA. Check for time or venue changes.
+LOCATION:Watty Graham Park\, Maghera
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-08-22-u14l2-magherafelt@glen-fixtures
+DTSTAMP:20261007T224550Z
+DTSTART:20260822T160000Z
+DTEND:20260822T173000Z
+SUMMARY:Glen 8-13 v 7-5 Magherafelt (U14 Ladies 2)
+DESCRIPTION:U14 Championship · Cup Division 5 · Final\nFrom Derry GAA. Ch
+ eck for time or venue changes.
+LOCATION:Magherafelt
+END:VEVENT
+END:VCALENDAR
