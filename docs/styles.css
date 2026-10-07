@@ -398,3 +398,7 @@ footer p { margin: 0; }
 .netnote { margin: 0; padding: 8px 12px; border-radius: 10px; background: var(--gold-bg); color: var(--gold-ink); font-weight: 600; font-size: 0.9rem; }
 .sheet-card form { display: grid; gap: 12px; }
 .sheet-card .err { margin: 0; color: var(--loss); font-weight: 600; font-size: 0.92rem; }
+.chip.club { background: var(--win-bg); color: var(--win); }
+.xtools { margin: 4px 0 0; gap: 4px 14px; }
+.xtools .linkbtn { padding: 2px 0; font-size: 0.88rem; }
+#view > .btnrow .hint { flex: 1 1 14rem; }

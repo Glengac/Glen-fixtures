@@ -10,7 +10,7 @@
 
   let DATA = { updated: null, teams: [], games: [] };
   let TEAMS = {};
-  let LIVE = { lineups: {}, match: null };
+  let LIVE = { lineups: {}, match: null, extra: [] };
   let dataState = "loading";        // loading | ready | error
   let liveState = CFG ? "loading" : "off"; // off | loading | ready | error
   let db = null, auth = null, user = null;
@@ -188,6 +188,8 @@
     return out;
   }
   function lineupFor(team) { return (LIVE.lineups && LIVE.lineups[team]) || {}; }
+  /* Derry GAA fixtures plus games the club adds itself (Ulster club, LGFA, challenge games) */
+  function allGames() { return DATA.games.concat(LIVE.extra || []); }
   function normaliseLive(v) {
     v = v || {};
     let m = v.match || null;
@@ -198,7 +200,10 @@
         events: Object.keys(evs).map(function (k) { return Object.assign({}, evs[k], { id: k }); })
       });
     }
-    return { lineups: v.lineups || {}, match: m };
+    const xs = v.fixtures || {};
+    const extra = Object.keys(xs).map(function (k) { return Object.assign({}, xs[k], { id: k, src: "club" }); })
+      .filter(function (g) { return g.d && g.opp && g.team; });
+    return { lineups: v.lineups || {}, match: m, extra: extra };
   }
 
   /* ---------- state ---------- */
@@ -226,7 +231,7 @@
     '</div><div class="picker" id="picker"><label for="team">Team</label><select id="team"><option value="all">All teams</option></select></div></div>' +
     '<main id="view" role="tabpanel"><div class="list"><div class="empty">Loading fixtures…</div></div></main>' +
     '<footer><p>Official fixtures and results from <a href="https://derry.clubandcounty.com/clubs/glen-watty-grahams/" target="_blank" rel="noopener">Derry GAA</a>. ' +
-    'Throw-in times and venues can change, so check before you travel. Live scores are entered by the club during games.</p>' +
+    'Games marked "Added by club" and live scores are entered by the club. Throw-in times and venues can change, so check before you travel.</p>' +
     '<p id="updated"></p><div class="foot-actions" id="foot-actions"></div></footer>';
 
   const sheet = document.createElement("div");
@@ -263,7 +268,7 @@
 
   /* ---------- fixtures & results ---------- */
   function split(today) {
-    const mine = DATA.games.filter(function (g) { return state.team === "all" || g.team === state.team; });
+    const mine = allGames().filter(function (g) { return state.team === "all" || g.team === state.team; });
     const upcoming = mine.filter(function (g) { return g.st === "fixture" && g.d >= today; })
       .sort(function (a, b) { return (a.d + (a.t || "")).localeCompare(b.d + (b.t || "")); });
     const past = mine.filter(function (g) { return !(g.st === "fixture" && g.d >= today); })
@@ -272,6 +277,7 @@
   }
   function eyebrow(g, showWinners) {
     let h = '<p class="eyebrow">' + esc(teamName(g.team));
+    if (g.src === "club") h += ' <span class="chip club">Added by club</span>';
     if (isFinal(g)) {
       const o = outcome(g);
       h += ' <span class="chip final">' + (showWinners && (o === "w" || o === "wo") ? "Winners" : "Final") + "</span>";
@@ -286,7 +292,7 @@
       '<p class="meta"><time>' + esc(g.t || "Time TBC") + '</time><span aria-hidden="true">·</span>' + mapsLink(g.venue) +
       ' <span class="chip ha">' + HA[g.ha] + "</span></p>" +
       (cal ? '<p class="cal">Add to calendar: <a href="' + esc(cal.google) + '" target="_blank" rel="noopener">Google</a><a href="' + esc(cal.outlook) + '" target="_blank" rel="noopener">Outlook</a></p>' : "") +
-      "</div></article>";
+      xtools(g) + "</div></article>";
   }
   function resultRow(g) {
     const o = outcome(g);
@@ -305,7 +311,12 @@
       '<p class="meta">' + (g.t ? "<time>" + esc(g.t) + '</time><span aria-hidden="true">·</span>' : "") + mapsLink(g.venue) +
       ' <span class="chip ha">' + HA[g.ha] + "</span>" +
       (g.note ? '<span aria-hidden="true">·</span><span>' + esc(g.note) + "</span>" : "") + "</p>" +
-      "</div>" + score + "</article>";
+      xtools(g) + "</div>" + score + "</article>";
+  }
+  function xtools(g) {
+    if (g.src !== "club" || !canScore()) return "";
+    return '<p class="btnrow xtools"><button type="button" class="linkbtn" data-act="xedit" data-id="' + esc(g.id) + '">' +
+      (g.st === "fixture" ? "Edit" : "Edit or add result") + '</button><button type="button" class="linkbtn danger" data-act="xrm" data-id="' + esc(g.id) + '">Remove</button></p>';
   }
   function groupByDate(list, rowFn) {
     let html = "", last = null;
@@ -365,7 +376,8 @@
         if (later.length) html += '<section class="section"><h2>Later <small>' + n(later.length) + "</small></h2>" + groupByDate(later, fixtureRow) + "</section>";
       }
     }
-    return html + subscribeHtml();
+    const add = canScore() ? '<div class="btnrow"><button type="button" class="pbtn" data-act="xadd">Add a game</button><p class="hint">For games Derry GAA doesn\'t list: Ulster club, LGFA, camogie, challenge games.</p></div>' : "";
+    return add + html + subscribeHtml();
   }
   function resultsHtml(s) {
     if (!s.past.length) return '<div class="list"><div class="empty"><strong>No results for ' + esc(teamLabel()) + " yet</strong>Scores appear here after each game.</div></div>";
@@ -392,7 +404,7 @@
 
   function nextGameLine() {
     const today = londonToday();
-    const g = DATA.games.filter(function (x) { return x.st === "fixture" && x.d >= today; })
+    const g = allGames().filter(function (x) { return x.st === "fixture" && x.d >= today; })
       .sort(function (a, b) { return (a.d + (a.t || "")).localeCompare(b.d + (b.t || "")); })[0];
     if (!g) return "Scores appear here while a Glen game is on.";
     return "Next game: " + esc(teamName(g.team)) + " v " + esc(g.opp) + ", " + esc(relDay(today, g.d).toLowerCase()) +
@@ -454,7 +466,7 @@
 
   function setupCandidates() {
     const today = londonToday();
-    return DATA.games.filter(function (g) { return g.st === "fixture" && g.d >= addDays(today, -1) && g.d <= addDays(today, 7); })
+    return allGames().filter(function (g) { return g.st === "fixture" && g.d >= addDays(today, -1) && g.d <= addDays(today, 7); })
       .sort(function (a, b) { return (a.d + (a.t || "")).localeCompare(b.d + (b.t || "")); });
   }
 
@@ -614,6 +626,31 @@
       '<div class="btnrow"><button type="button" class="pbtn" data-act="pick" data-kind="' + kind + '" data-no="">Add without a name</button>' +
       '<button type="button" class="linkbtn" data-act="close">Cancel</button></div>');
   }
+  function openGameForm(g) {
+    g = g || { team: state.team !== "all" ? state.team : "", ha: "H" };
+    const teamOpts = DATA.teams.map(function (t) { return '<option value="' + esc(t.id) + '"' + (t.id === g.team ? " selected" : "") + ">" + esc(t.name) + "</option>"; }).join("");
+    const haOpts = ["H", "A", "N"].map(function (k) { return '<option value="' + k + '"' + (k === (g.ha || "H") ? " selected" : "") + ">" + HA[k] + "</option>"; }).join("");
+    const field = function (id, label, value, attrs) {
+      return '<div class="field"><label for="' + id + '">' + label + '</label><input id="' + id + '" value="' + esc(value || "") + '" ' + (attrs || "") + "></div>";
+    };
+    const past = g.id && g.d && g.d <= londonToday();
+    openSheet('<h2 id="sheet-title">' + (g.id ? "Edit game" : "Add a game") + "</h2>" +
+      '<form id="x-form" data-id="' + esc(g.id || "") + '">' +
+      '<div class="field"><label for="x-team">Team</label><select id="x-team" required>' + teamOpts + "</select></div>" +
+      field("x-opp", "Opponent", g.opp, 'required autocomplete="off" placeholder="e.g. Burren"') +
+      field("x-date", "Date", g.d, 'type="date" required') +
+      field("x-time", "Throw-in", g.t, 'type="time"') +
+      field("x-comp", "Competition", g.comp, 'required autocomplete="off" placeholder="e.g. Ulster LGFA Senior Club Championship"') +
+      field("x-round", "Round", g.round, 'autocomplete="off" placeholder="e.g. Quarter-final"') +
+      field("x-venue", "Venue", g.venue, 'autocomplete="off" placeholder="e.g. Watty Graham Park"') +
+      '<div class="field"><label for="x-ha">Home or away</label><select id="x-ha">' + haOpts + "</select></div>" +
+      (past || g.us ? "<h3>Result</h3>" +
+        field("x-us", "Glen score (goals-points)", g.us, 'inputmode="numeric" autocomplete="off" placeholder="e.g. 1-12"') +
+        field("x-them", "Opponent score (goals-points)", g.them, 'inputmode="numeric" autocomplete="off" placeholder="e.g. 0-9"') : "") +
+      '<p class="err" id="x-err" hidden></p>' +
+      '<div class="btnrow"><button type="submit" class="pbtn">Save game</button><button type="button" class="linkbtn" data-act="close">Cancel</button></div>' +
+      "</form>");
+  }
   function openTeamSheet(team) {
     const lu = lineupFor(team);
     const row = function (n, label) {
@@ -672,10 +709,23 @@
     } else if (act === "pick-opp" && m) {
       const inp = $("#opp-scorer");
       addScore("opp", b.dataset.kind, null, inp ? inp.value.trim().slice(0, 40) : "");
+    } else if (act === "xadd") openGameForm(null);
+    else if (act === "xedit") {
+      const xg = (LIVE.extra || []).filter(function (x) { return x.id === b.dataset.id; })[0];
+      if (xg) openGameForm(xg);
+    } else if (act === "xrm") {
+      if (!armed(b, "Tap again to remove")) return;
+      save(liveRef("fixtures/" + b.dataset.id).remove(), "Game removed");
     } else if (act === "phase" && m) {
       const key = { pre: "h1", "1h": "ht", ht: "h2", "2h": "ft" }[phase(m)];
-      if (key) save(liveRef("match/clock/" + key).set(firebase.database.ServerValue.TIMESTAMP),
-        { h1: "Game started", ht: "Half-time", h2: "2nd half started", ft: "Full-time" }[key]);
+      const msg = { h1: "Game started", ht: "Half-time", h2: "2nd half started", ft: "Full-time" }[key];
+      if (key === "ft" && m.gid) {
+        const upd = { "match/clock/ft": firebase.database.ServerValue.TIMESTAMP };
+        upd["fixtures/" + m.gid + "/us"] = gp(tally(m.events, "glen"));
+        upd["fixtures/" + m.gid + "/them"] = gp(tally(m.events, "opp"));
+        upd["fixtures/" + m.gid + "/st"] = "result";
+        save(liveRef().update(upd), "Full-time. Result saved to the game.");
+      } else if (key) save(liveRef("match/clock/" + key).set(firebase.database.ServerValue.TIMESTAMP), msg);
     } else if (act === "unphase" && m) {
       const k = ["ft", "h2", "ht", "h1"].filter(function (x) { return m.clock[x]; })[0];
       if (k) save(liveRef("match/clock/" + k).remove(), "Undone");
@@ -700,6 +750,7 @@
         const g = setupCandidates()[+v];
         match = { team: g.team, opp: g.opp, comp: g.comp + " · " + g.round, venue: g.venue === "TBC" ? "" : g.venue, d: g.d };
         if (g.t) match.t = g.t;
+        if (g.src === "club") match.gid = g.id;
       }
       match.half = +$("#setup-half").value || 30;
       save(liveRef("match").set(match), "Live game set up");
@@ -727,6 +778,26 @@
         err.textContent = "That email or password didn't work. Check them and try again.";
         err.hidden = false;
       });
+    } else if (form.id === "x-form") {
+      ev.preventDefault();
+      if (!canScore() || !db) return;
+      const val = function (id) { const el = $("#" + id); return el ? el.value.trim() : ""; };
+      const err = $("#x-err");
+      const us = val("x-us"), them = val("x-them");
+      if ((us || them) && !(/^\d+-\d+$/.test(us) && /^\d+-\d+$/.test(them))) {
+        err.textContent = "Write both scores as goals-points, like 1-12 and 0-9.";
+        err.hidden = false;
+        return;
+      }
+      const g = { team: val("x-team"), opp: val("x-opp").slice(0, 40), d: val("x-date"), comp: val("x-comp").slice(0, 80),
+        round: val("x-round").slice(0, 40) || "Game", venue: val("x-venue").slice(0, 60) || "TBC", ha: val("x-ha") || "H",
+        st: us && them ? "result" : "fixture" };
+      if (val("x-time")) g.t = val("x-time");
+      if (us && them) { g.us = us; g.them = them; }
+      if (!g.team || !g.opp || !g.d || !g.comp) { err.textContent = "Fill in the team, opponent, date and competition."; err.hidden = false; return; }
+      closeSheet();
+      const id = form.dataset.id;
+      save(id ? liveRef("fixtures/" + id).set(g) : liveRef("fixtures").push(g), id ? "Game updated" : "Game added");
     } else if (form.id === "ts-form") {
       ev.preventDefault();
       if (!canScore() || !db) return;
@@ -790,7 +861,7 @@
         auth.onAuthStateChanged(function (u) { user = u; render(); });
         liveRef().on("value", function (snap) {
           const v = snap.val() || {};
-          LIVE = normaliseLive({ lineups: readLineups(v.lineups), match: v.match });
+          LIVE = normaliseLive({ lineups: readLineups(v.lineups), match: v.match, fixtures: v.fixtures });
           const first = liveState !== "ready";
           liveState = "ready";
           if (first && !tabChosen && (isActive(LIVE.match) || (LIVE.match && LIVE.match.d === londonToday()))) state.tab = "live";

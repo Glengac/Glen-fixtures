@@ -42,6 +42,11 @@
    "group": "Football"
   },
   {
+   "id": "sl",
+   "name": "Senior Ladies",
+   "group": "Ladies football"
+  },
+  {
    "id": "int",
    "name": "Intermediate Ladies",
    "group": "Ladies football"
