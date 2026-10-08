@@ -13,6 +13,7 @@ Fixtures, results and live scores for every Watty Graham's GAC Glen team.
 1. Open the site, tap **Scorer sign-in** at the bottom, and sign in.
 2. On the **Live** tab, pick the game, name the team, then tap **Set up live game**. To run another game at the same time, tap **Start another live game**; each game gets its own tab.
 3. Tap **Throw-in** when the game starts, then tap Point (white flag), 2 points (orange flag) or Goal (green flag) for each score and pick the scorer.
-4. Use Half-time, Start 2nd half and Full-time as the game goes on. Every step can be undone, and any score can be removed.
+   For a substitution, tap **Make a sub**, then who's coming off and who's going on. Subs show in the scores list and on the pitch, and are stored under each game's `subs` (separate from `events`, so they never count towards the score).
+4. Use Half-time, Start 2nd half and Full-time as the game goes on. Every step can be undone, and any score or sub can be removed (tap its ✕ twice).
 
 If the signal drops at the pitch, scores entered on the scorer's phone are kept and sent when it reconnects.

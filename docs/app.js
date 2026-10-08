@@ -62,6 +62,8 @@
     { n: 15, pos: "Left corner-forward",  x: 83, y: 81 }
   ];
   const SUB_NUMBERS = [16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26];
+  /* Substitution icon: green arrow on, red arrow off */
+  const SUB_SVG = '<svg class="subi" viewBox="0 0 24 24" aria-hidden="true"><path class="up" d="M8 20V5M3.5 9.5 8 5l4.5 4.5"/><path class="dn" d="M16 4v15m-4.5-4.5L16 19l4.5-4.5"/></svg>';
 
   /* ---------- helpers ---------- */
   const $ = function (sel, root) { return (root || document).querySelector(sel); };
@@ -203,7 +205,7 @@
   function tally(events, side) {
     let g = 0, p = 0;
     events.forEach(function (e) {
-      if (e.side !== side) return;
+      if (e.side !== side || !KINDS[e.type]) return;
       if (e.type === "goal") g++; else p += e.type === "two" ? 2 : 1;
     });
     return { g: g, p: p, t: g * 3 + p };
@@ -220,6 +222,38 @@
     return out;
   }
   function lineupFor(team) { return (LIVE.lineups && LIVE.lineups[team]) || {}; }
+  function byAt(a, b) { return (a.at || 0) - (b.at || 0); }
+  /* Who's on the pitch now: the team sheet with this game's subs applied in order.
+     field: position 1-15 -> { name, no, sub }; spare: everyone who could come on (unused subs, then players taken off) */
+  function lineupNow(m) {
+    const lu = lineupFor(m.team);
+    const field = {};
+    POS.forEach(function (p) { field[p.n] = { name: lu[p.n] || "", no: p.n }; });
+    const offAt = {};
+    (m.subs || []).slice().sort(byAt).forEach(function (s) {
+      const cur = field[s.pos];
+      if (!cur) return;
+      const offName = cur.name || s.offName || "";
+      if (offName) offAt[offName] = { no: cur.no, min: s.min, ht: s.ht };
+      field[s.pos] = { name: s.onName || "", no: s.onNo || null, sub: true };
+    });
+    const onNow = {};
+    POS.forEach(function (p) { if (field[p.n].name) onNow[field[p.n].name] = true; });
+    const spare = [], seen = {};
+    SUB_NUMBERS.forEach(function (n) {
+      const name = lu[n];
+      if (!name || onNow[name] || seen[name] || offAt[name]) return;
+      seen[name] = true;
+      spare.push({ name: name, no: n });
+    });
+    Object.keys(offAt).forEach(function (name) {
+      if (onNow[name] || seen[name]) return;
+      seen[name] = true;
+      spare.push({ name: name, no: offAt[name].no, off: offAt[name] });
+    });
+    return { field: field, spare: spare };
+  }
+  function subMin(s, m) { return s.ht ? "HT" : minLabel(s.min, m.half); }
   /* Derry GAA and Ulster LGFA fixtures plus games the club adds itself */
   function allGames() {
     const key = function (g) { return g.d + "|" + String(g.opp || "").trim().toLowerCase(); };
@@ -233,10 +267,12 @@
     return games.concat((LIVE.extra || []).filter(function (g) { return !official[key(g)]; }));
   }
   function readMatch(raw, id, path) {
-    const evs = raw.events || {};
+    const evs = raw.events || {}, sbs = raw.subs || {};
     return Object.assign({}, raw, {
       id: id, path: path, clock: raw.clock || {},
-      events: Object.keys(evs).map(function (k) { return Object.assign({}, evs[k], { id: k }); })
+      events: Object.keys(evs).map(function (k) { return Object.assign({}, evs[k], { id: k }); }),
+      /* subs live apart from events so older copies of the page never count them as scores */
+      subs: Object.keys(sbs).map(function (k) { return Object.assign({}, sbs[k], { id: k }); }).filter(function (s) { return s && s.pos; })
     });
   }
   function normaliseLive(v) {
@@ -490,56 +526,73 @@
   }
 
   function pitchHtml(m) {
-    const lu = lineupFor(m.team);
+    const now = lineupNow(m);
     const tallies = playerTallies(m.events);
     const slots = POS.map(function (p) {
-      const name = lu[p.n] || "";
-      const t = name && tallies[name];
-      return '<div class="slot" style="left:' + p.x + "%;top:" + p.y + '%"><span class="no">' + p.n + "</span>" +
-        '<span class="nm">' + (name ? esc(name) : '<span class="tbc">' + esc(p.pos) + "</span>") + "</span>" +
+      const s = now.field[p.n];
+      const t = s.name && tallies[s.name];
+      return '<div class="slot' + (s.sub ? " in" : "") + '" style="left:' + p.x + "%;top:" + p.y + '%">' +
+        '<span class="no"' + (s.sub ? ' title="Came on as a sub"' : "") + ">" + (s.no || p.n) + "</span>" +
+        '<span class="nm">' + (s.name ? esc(s.name) : '<span class="tbc">' + esc(p.pos) + "</span>") + "</span>" +
         (t ? '<span class="tl" title="Scored ' + gp(t) + '">' + gp(t) + "</span>" : "") + "</div>";
     }).join("");
-    const subs = SUB_NUMBERS.filter(function (n) { return lu[n]; }).map(function (n) {
-      const t = tallies[lu[n]];
-      return "<li><b>" + n + "</b>" + esc(lu[n]) + (t ? '<span class="tl">' + gp(t) + "</span>" : "") + "</li>";
+    const bench = now.spare.map(function (s) {
+      const t = tallies[s.name];
+      return "<li" + (s.off ? ' class="out"' : "") + ">" + (s.no ? "<b>" + s.no + "</b>" : "") + esc(s.name) +
+        (t ? '<span class="tl">' + gp(t) + "</span>" : "") +
+        (s.off ? '<span class="offm">off ' + (s.off.ht ? "HT" : minLabel(s.off.min, m.half)) + "</span>" : "") + "</li>";
     }).join("");
-    return '<div class="pitch" role="img" aria-label="' + esc(teamName(m.team)) + ' team sheet">' + PITCH_SVG + slots + "</div>" +
-      (subs ? '<ul class="subs" aria-label="Substitutes">' + subs + "</ul>" : "") +
-      '<p class="legend">' +
-      "<span>" + flagSvg("pt") + "Point, 1</span>" +
-      "<span>" + flagSvg("two") + "From outside the arc, 2</span>" +
-      "<span>" + flagSvg("goal") + "Goal, 3</span></p>";
+    return '<div class="pitch" role="img" aria-label="' + esc(teamName(m.team)) + ' team on the pitch">' + PITCH_SVG + slots + "</div>" +
+      (bench ? '<ul class="subs" aria-label="Bench">' + bench + "</ul>" : "");
   }
 
+  function legendHtml() {
+    return '<p class="legend">' +
+      "<span>" + flagSvg("pt") + "Point, 1</span>" +
+      "<span>" + flagSvg("two") + "From outside the arc, 2</span>" +
+      "<span>" + flagSvg("goal") + "Goal, 3</span>" +
+      "<span>" + SUB_SVG + "Sub</span></p>";
+  }
+
+  /* Two-sided list: Glen's scores and subs on the left, the opposition's on the right, minute and running score down the middle */
   function feedHtml(m) {
-    if (!m.events.length) return '<div class="list"><div class="empty">No scores yet. Each score shows here with the scorer and the umpire\'s flag.</div></div>';
-    const evs = m.events.slice().sort(function (a, b) { return a.at - b.at; });
+    const subs = m.subs || [];
+    if (!m.events.length && !subs.length) return '<div class="list"><div class="empty">No scores yet. Glen\'s scores show on the left and ' + esc(m.opp) + "'s on the right, with the scorer and the umpire's flag.</div></div>";
+    const items = m.events.map(function (e) { return { k: "score", e: e, at: e.at }; })
+      .concat(subs.map(function (s) { return { k: "sub", e: s, at: s.at }; }))
+      .sort(byAt);
     const g = { g: 0, p: 0 }, o = { g: 0, p: 0 };
-    const rows = evs.map(function (e) {
-      const s = e.side === "glen" ? g : o;
-      if (e.type === "goal") s.g++; else s.p += e.type === "two" ? 2 : 1;
-      return { e: e, run: gp(g) + " <span>–</span> " + gp(o) };
-    }).reverse();
-    let html = "", lastHalf = null;
-    rows.forEach(function (r) {
-      const e = r.e;
-      if (e.half !== lastHalf) { html += '<div class="daterow">' + (e.half === 2 ? "Second half" : "First half") + "</div>"; lastHalf = e.half; }
-      const k = KINDS[e.type] || KINDS.pt;
-      let who, what;
-      if (e.side === "glen") {
-        who = e.player ? esc(e.player) : "Glen";
-        what = k.label + (e.no ? " · No. " + e.no : "") + (e.player ? "" : " · scorer not recorded");
-      } else {
-        who = e.player ? esc(e.player) + " (" + esc(m.opp) + ")" : esc(m.opp);
-        what = k.label;
-      }
-      html += '<div class="ev ' + (e.side === "glen" ? "glen" : "opp") + '">' +
-        '<span class="min">' + minLabel(e.min, m.half) + "</span>" + flagSvg(e.type) +
-        '<div class="evb"><span class="who">' + who + '</span><span class="what">' + what + "</span>" +
-        (canScore() ? '<button type="button" class="linkbtn danger" data-act="rm" data-mid="' + esc(m.id) + '" data-id="' + esc(e.id) + '">Remove</button>' : "") +
-        "</div>" + '<span class="run" title="Glen first">' + r.run + "</span></div>";
+    items.forEach(function (it) {
+      if (it.k !== "score") return;
+      const s = it.e.side === "glen" ? g : o;
+      if (it.e.type === "goal") s.g++; else s.p += it.e.type === "two" ? 2 : 1;
+      it.run = gp(g) + "<i>–</i>" + gp(o);
     });
-    return '<div class="list">' + html + "</div>";
+    items.reverse();
+    const scorer = canScore(), mid = ' data-mid="' + esc(m.id) + '"';
+    let html = '<div class="fr fhead"><span class="fs glen">Glen</span><span class="fm">Min</span><span class="fs opp">' + esc(m.opp) + "</span></div>";
+    let lastHalf = null;
+    items.forEach(function (it) {
+      const e = it.e;
+      const half = e.half === 2 ? 2 : 1;
+      if (half !== lastHalf) { html += '<div class="daterow">' + (half === 2 ? "Second half" : "First half") + "</div>"; lastHalf = half; }
+      const side = it.k === "sub" ? "glen" : e.side === "glen" ? "glen" : "opp";
+      let body, rm = "";
+      if (it.k === "sub") {
+        body = '<span class="subn"><span class="on"><span class="sr">On: </span>' + esc(e.onName || "Sub") + "</span>" +
+          '<span class="off"><span class="sr">off: </span>' + esc(e.offName || "No. " + e.pos) + "</span></span>" + SUB_SVG;
+        if (scorer) rm = '<button type="button" class="xbtn" data-act="rmsub"' + mid + ' data-id="' + esc(e.id) + '" aria-label="Remove this sub">✕</button>';
+      } else {
+        const k = KINDS[e.type] || KINDS.pt;
+        body = '<span class="nm">' + '<span class="sr">' + k.label + ", </span>" + (e.player ? esc(e.player) : '<span class="anon">' + k.label + "</span>") + "</span>" + flagSvg(e.type);
+        if (scorer) rm = '<button type="button" class="xbtn" data-act="rm"' + mid + ' data-id="' + esc(e.id) + '" aria-label="Remove this score">✕</button>';
+      }
+      const cell = '<div class="fs ' + side + '">' + rm + body + "</div>";
+      const centre = '<div class="fm"><b>' + (it.k === "sub" ? subMin(e, m) : minLabel(e.min, m.half)) + "</b>" + (it.run ? "<span>" + it.run + "</span>" : "") + "</div>";
+      html += '<div class="fr is-' + it.k + (it.k === "score" ? " k-" + e.type : "") + '">' +
+        (side === "glen" ? cell + centre + '<div class="fs"></div>' : '<div class="fs"></div>' + centre + cell) + "</div>";
+    });
+    return '<div class="list feed">' + html + "</div>";
   }
 
   /* Upcoming games (yesterday to a week ahead) not already live */
@@ -593,6 +646,8 @@
       (undo ? '<button type="button" class="linkbtn" data-act="unphase"' + mid + ">" + undo + "</button>" : "") + "</div>" +
       '<p class="row-label">Glen scored</p>' + btns("glen") +
       '<p class="row-label">' + esc(m.opp) + " scored</p>" + btns("opp") +
+      '<p class="row-label">Glen subs</p>' +
+      '<button type="button" class="sbtn subbtn" data-act="subopen"' + mid + ">" + SUB_SVG + "<span>Make a sub<small>Who's coming off and who's going on</small></span></button>" +
       '<div class="btnrow"><button type="button" class="linkbtn" data-act="sheet"' + mid + ">Edit team sheet</button>" +
       '<button type="button" class="linkbtn danger" data-act="clear"' + mid + ">Clear this game</button></div>" +
       "</section>";
@@ -636,12 +691,15 @@
         (canScore() ? setupHtml(false) : "");
     }
     const m = list.filter(function (x) { return x.id === state.mid; })[0] || list[0];
-    const named = POS.filter(function (p) { return lineupFor(m.team)[p.n]; }).length;
+    const field = lineupNow(m).field;
+    const named = POS.filter(function (p) { return field[p.n].name; }).length;
+    const nsubs = (m.subs || []).length;
+    const counts = m.events.length + (m.events.length === 1 ? " score" : " scores") + (nsubs ? " · " + nsubs + (nsubs === 1 ? " sub" : " subs") : "");
     const another = !canScore() ? "" : state.showSetup ? setupHtml(true)
       : '<div class="btnrow"><button type="button" class="linkbtn" data-act="showsetup">Start another live game</button></div>';
     return matchTabs(list, m) + boardHtml(m) +
       (canScore() ? scorerHtml(m) : "") +
-      '<section class="section"><h2>Scores <small>' + m.events.length + (m.events.length === 1 ? " score" : " scores") + "</small></h2>" + feedHtml(m) + "</section>" +
+      '<section class="section"><h2>Scores <small>' + counts + "</small></h2>" + feedHtml(m) + legendHtml() + "</section>" +
       '<section class="section"><h2>Team <small>' + (named ? named + " of 15 named" : "Team sheet to come") + "</small></h2>" + pitchHtml(m) + "</section>" +
       another;
   }
@@ -736,16 +794,50 @@
         '<div class="btnrow"><button type="button" class="pbtn" data-act="pick-opp"' + mid + ' data-kind="' + kind + '">Add ' + k.label.toLowerCase() + '</button><button type="button" class="linkbtn" data-act="close">Cancel</button></div>');
       return;
     }
-    const lu = lineupFor(m.team);
-    const nums = POS.map(function (p) { return p.n; }).concat(SUB_NUMBERS).filter(function (n) { return lu[n]; });
-    const btns = nums.map(function (n) {
-      return '<button type="button" data-act="pick"' + mid + ' data-kind="' + kind + '" data-no="' + n + '"><b>' + n + "</b><span>" + esc(lu[n]) + "</span></button>";
-    }).join("");
+    const now = lineupNow(m);
+    const pbtn = function (p) {
+      return '<button type="button" data-act="pick"' + mid + ' data-kind="' + kind + '" data-no="' + (p.no || "") + '" data-name="' + esc(p.name) + '">' +
+        "<b>" + (p.no || "") + "</b><span>" + esc(p.name) + "</span></button>";
+    };
+    const onPitch = POS.map(function (p) { return now.field[p.n]; }).filter(function (p) { return p.name; }).map(pbtn).join("");
+    const bench = now.spare.map(pbtn).join("");
     openSheet('<h2 id="sheet-title">' + flagSvg(kind) + "Glen · " + k.label + "</h2>" +
-      (btns ? '<p class="hint">Who scored?</p><div class="players">' + btns + "</div>"
-            : '<p class="hint">Name the team sheet to pick who scored. You can still add the score now.</p>') +
+      (onPitch || bench ? '<p class="hint">Who scored?</p>' + (onPitch ? '<div class="players compact">' + onPitch + "</div>" : "") +
+          (bench ? "<h3>Bench</h3>" + '<div class="players compact">' + bench + "</div>" : "")
+        : '<p class="hint">Name the team sheet to pick who scored. You can still add the score now.</p>') +
       '<div class="btnrow"><button type="button" class="pbtn" data-act="pick"' + mid + ' data-kind="' + kind + '" data-no="">Add without a name</button>' +
       '<button type="button" class="linkbtn" data-act="close">Cancel</button></div>');
+  }
+  /* Make a sub: tap who's coming off, then who's going on (a bench player, someone taken off earlier, or a typed name) */
+  let subCtx = null;
+  function openSubSheet(m) {
+    const mid = ' data-mid="' + esc(m.id) + '"';
+    if (phase(m) === "pre") {
+      openSheet('<h2 id="sheet-title">' + SUB_SVG + "Glen sub</h2>" +
+        "<p class=\"hint\">The game hasn't started yet. To change who starts, edit the team sheet. Subs made after throw-in show in the scores list and on the pitch.</p>" +
+        '<div class="btnrow"><button type="button" class="pbtn" data-act="sheet"' + mid + '>Edit team sheet</button><button type="button" class="linkbtn" data-act="close">Cancel</button></div>');
+      return;
+    }
+    const now = lineupNow(m);
+    subCtx = { mid: m.id, spare: now.spare, field: now.field };
+    const offBtns = POS.map(function (p) {
+      const s = now.field[p.n];
+      return '<button type="button" data-act="suboff" data-pos="' + p.n + '" aria-pressed="false"><b>' + (s.no || p.n) + "</b>" +
+        "<span>" + (s.name ? esc(s.name) : '<span class="tbc">' + esc(p.pos) + "</span>") + "</span></button>";
+    }).join("");
+    const onBtns = now.spare.map(function (s, i) {
+      return '<button type="button" data-act="subon" data-i="' + i + '" aria-pressed="false"><b>' + (s.no || "") + "</b>" +
+        "<span>" + esc(s.name) + (s.off ? " <small>off " + (s.off.ht ? "HT" : minLabel(s.off.min, m.half)) + "</small>" : "") + "</span></button>";
+    }).join("");
+    openSheet('<h2 id="sheet-title">' + SUB_SVG + "Glen sub</h2>" +
+      '<form id="sub-form"' + mid + ">" +
+      '<h3 class="subh off">Coming off</h3><div class="players compact" id="sub-off">' + offBtns + "</div>" +
+      '<h3 class="subh on">Going on</h3>' +
+      (onBtns ? '<div class="players compact" id="sub-on">' + onBtns + "</div>" : '<p class="hint">No subs are named on the team sheet. Type the name below.</p>') +
+      field("sub-name", onBtns ? "Or type a name" : "Name", "", 'autocomplete="off" placeholder="e.g. Shea N."') +
+      '<p class="err" id="sub-err" hidden></p>' +
+      '<div class="btnrow"><button type="submit" class="pbtn">Make sub</button><button type="button" class="linkbtn" data-act="close">Cancel</button></div>' +
+      "</form>");
   }
   function field(id, label, value, attrs, hint) {
     return '<div class="field"><label for="' + id + '">' + label + '</label><input id="' + id + '" value="' + esc(value || "") + '" ' + (attrs || "") + ">" +
@@ -1013,12 +1105,18 @@
         .catch(function () { toast("That didn't save. Try again."); });
       return;
     }
+    if (act === "suboff" || act === "subon") {
+      b.parentElement.querySelectorAll("button").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+      if (act === "subon" && $("#sub-name")) $("#sub-name").value = "";
+      if ($("#sub-err")) $("#sub-err").hidden = true;
+      return;
+    }
     if (!canScore() || !db) return;
     const m = b.dataset.mid ? matchById(b.dataset.mid) : null;
     if (act === "add" && m) openScorerPicker(m, b.dataset.side, b.dataset.kind);
     else if (act === "pick" && m) {
       const no = b.dataset.no ? +b.dataset.no : null;
-      addScore(m, "glen", b.dataset.kind, no, no ? (lineupFor(m.team)[no] || "") : "");
+      addScore(m, "glen", b.dataset.kind, no, b.dataset.name || "");
     } else if (act === "pick-opp" && m) {
       const inp = $("#opp-scorer");
       addScore(m, "opp", b.dataset.kind, null, inp ? inp.value.trim().slice(0, 40) : "");
@@ -1048,8 +1146,12 @@
       upd[m.path + "/clock/" + k] = null;
       if (k === "ft") removeResult(m, upd);
       save(liveRef().update(upd), k === "ft" ? "Full-time undone. The result is off Results until you tap Full-time again." : "Undone");
+    } else if (act === "subopen" && m) openSubSheet(m);
+    else if (act === "rmsub" && m) {
+      if (!armed(b, "✕")) { toast("Tap the red ✕ again to remove that sub."); return; }
+      save(mref(m, "subs/" + b.dataset.id).remove(), "Sub removed");
     } else if (act === "rm" && m) {
-      if (!armed(b, "Tap again to remove")) return;
+      if (!armed(b, "✕")) { toast("Tap the red ✕ again to remove that score."); return; }
       if (phase(m) !== "ft") { save(mref(m, "events/" + b.dataset.id).remove(), "Score removed"); return; }
       const upd = {};
       upd[m.path + "/events/" + b.dataset.id] = null;
@@ -1096,6 +1198,12 @@
       $("#setup-other").hidden = ev.target.value !== "other";
     }
   });
+  document.addEventListener("input", function (ev) {
+    /* typing a name for the player going on replaces any bench player tapped */
+    if (ev.target.id === "sub-name" && ev.target.value) {
+      document.querySelectorAll("#sub-on button").forEach(function (x) { x.setAttribute("aria-pressed", "false"); });
+    }
+  });
   document.addEventListener("submit", function (ev) {
     const form = ev.target;
     const val = function (id) { const el = $("#" + id); return el ? el.value.trim() : ""; };
@@ -1107,6 +1215,31 @@
         closeSheet();
         toast("Signed in. Scoring controls are on the Live tab.");
       }).catch(function () { fail("si-err", "That email or password didn't work. Check them and try again."); });
+    } else if (form.id === "sub-form") {
+      ev.preventDefault();
+      if (!canScore() || !db || !subCtx) return;
+      const m = matchById(form.dataset.mid);
+      if (!m) { closeSheet(); return; }
+      const offB = form.querySelector("#sub-off [aria-pressed=true]");
+      if (!offB) return fail("sub-err", "Tap who's coming off.");
+      const typed = val("sub-name").slice(0, 40);
+      const onB = form.querySelector("#sub-on [aria-pressed=true]");
+      let on = null;
+      if (typed) {
+        on = subCtx.spare.filter(function (s) { return s.name.toLowerCase() === typed.toLowerCase(); })[0] || { name: typed };
+      } else if (onB) on = subCtx.spare[+onB.dataset.i];
+      if (!on) return fail("sub-err", "Tap who's going on, or type their name.");
+      const pos = +offB.dataset.pos;
+      const cur = lineupNow(m).field[pos] || {};
+      if (cur.name && cur.name === on.name) return fail("sub-err", "That's the same player.");
+      const at = now(), p = phase(m);
+      const s = { pos: pos, offName: cur.name || "", onName: on.name, half: p === "1h" ? 1 : 2, min: minuteAt(m, at), at: at };
+      if (cur.no) s.offNo = cur.no;
+      if (on.no) s.onNo = on.no;
+      if (p === "ht") s.ht = true;
+      closeSheet();
+      subCtx = null;
+      save(mref(m, "subs").push(s), on.name + " on for " + (cur.name || "No. " + pos));
     } else if (form.id === "x-form") {
       ev.preventDefault();
       if (!canScore() || !db) return;
