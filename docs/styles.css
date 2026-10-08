@@ -402,3 +402,36 @@ footer p { margin: 0; }
 .xtools { margin: 4px 0 0; gap: 4px 14px; }
 .xtools .linkbtn { padding: 2px 0; font-size: 0.88rem; }
 #view > .btnrow .hint { flex: 1 1 14rem; }
+
+/* Several live games */
+#view > * { min-width: 0; }
+.mtabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 2px; max-width: 100%; }
+.mtabs button {
+  flex: 0 0 auto; min-width: 9.5rem; max-width: 14rem; text-align: left; display: grid; gap: 2px;
+  padding: 8px 12px; border-radius: 12px; border: 1px solid var(--line);
+  background: var(--surface); color: var(--ink); cursor: pointer; font: inherit;
+}
+.mtabs button[aria-selected="true"] { background: var(--pitch); color: var(--on-pitch); border-color: var(--pitch); }
+.mtabs .mt-team { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; opacity: 0.85; }
+.mtabs .mt-score { font-family: var(--display); font-weight: 800; font-size: 1.25rem; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.mtabs .mt-st { font-size: 0.8rem; display: flex; align-items: center; gap: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.panel a.onpitch { color: var(--on-pitch-muted); text-underline-offset: 2px; }
+
+/* Venue and next-game tools */
+.nexttools { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; background: var(--surface); border: 1px dashed var(--line); border-radius: 12px; padding: 8px 12px; font-size: 0.92rem; color: var(--muted); }
+.nexttools .xtools { margin: 0; }
+.field .hint { margin: 2px 0 0; font-size: 0.82rem; }
+
+/* Manage scorers */
+.slist { margin: 0; padding: 0; display: grid; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.slist li { list-style: none; padding: 10px 12px; border-top: 1px solid var(--line); display: grid; gap: 2px; min-width: 0; }
+.slist li:first-child { border-top: 0; }
+.slist .nm { font-weight: 700; }
+.slist .em { color: var(--muted); font-size: 0.88rem; overflow-wrap: anywhere; }
+.slist .btnrow { gap: 4px 14px; }
+.slist .linkbtn { padding: 2px 0; font-size: 0.88rem; }
+.okmsg { margin: 0; color: var(--win); font-weight: 600; }
+.sheet-card details { border-top: 1px solid var(--line); padding-top: 10px; }
+.sheet-card details summary { cursor: pointer; font-weight: 600; color: var(--green); }
+.sheet-card details form { margin-top: 10px; }
+.foot-actions span { color: var(--muted); }
