@@ -18,7 +18,7 @@
 
   let DATA = { updated: null, teams: [], games: [] };
   let TEAMS = {};
-  let LIVE = { lineups: {}, matches: [], extra: [], venues: {} };
+  let LIVE = { lineups: {}, matches: [], extra: [], venues: {}, results: {} };
   let dataState = "loading";        // loading | ready | error
   let liveState = CFG ? "loading" : "off"; // off | loading | ready | error
   let db = null, auth = null, user = null, adderApp = null;
@@ -225,7 +225,12 @@
     const key = function (g) { return g.d + "|" + String(g.opp || "").trim().toLowerCase(); };
     const official = {};
     DATA.games.forEach(function (g) { official[key(g)] = true; });
-    return DATA.games.concat((LIVE.extra || []).filter(function (g) { return !official[key(g)]; }));
+    const res = LIVE.results || {};
+    const games = DATA.games.map(function (g) {
+      const r = g.st === "fixture" ? res[vkey(g)] : null;
+      return r && r.us && r.them ? Object.assign({}, g, { st: "result", us: r.us, them: r.them, clubScore: true }) : g;
+    });
+    return games.concat((LIVE.extra || []).filter(function (g) { return !official[key(g)]; }));
   }
   function readMatch(raw, id, path) {
     const evs = raw.events || {};
@@ -243,7 +248,7 @@
     const xs = v.fixtures || {};
     const extra = Object.keys(xs).map(function (k) { return Object.assign({}, xs[k], { id: k, src: "club" }); })
       .filter(function (g) { return g.d && g.opp && g.team; });
-    return { lineups: readLineups(v.lineups), matches: matches, extra: extra, venues: v.venues || {} };
+    return { lineups: readLineups(v.lineups), matches: matches, extra: extra, venues: v.venues || {}, results: v.results || {} };
   }
   function readLineups(raw) {
     const out = {};
@@ -340,6 +345,7 @@
   function eyebrow(g, showWinners) {
     let h = '<p class="eyebrow">' + esc(teamName(g.team));
     if (g.src === "club") h += ' <span class="chip club">Added by club</span>';
+    if (g.clubScore) h += ' <span class="chip club">Club score</span>';
     if (isFinal(g)) {
       const o = outcome(g);
       h += ' <span class="chip final">' + (showWinners && (o === "w" || o === "wo") ? "Winners" : "Final") + "</span>";
@@ -539,9 +545,11 @@
   /* Upcoming games (yesterday to a week ahead) not already live */
   function setupCandidates() {
     const today = londonToday();
-    const liveKeys = {};
-    LIVE.matches.forEach(function (m) { if (m.gkey) liveKeys[m.gkey] = true; });
-    return allGames().filter(function (g) { return g.st === "fixture" && g.d >= addDays(today, -1) && g.d <= addDays(today, 7) && !liveKeys[vkey(g)]; })
+    const liveKeys = {}, liveIds = {};
+    LIVE.matches.forEach(function (m) { if (m.gkey) liveKeys[m.gkey] = true; if (m.gid) liveIds[m.gid] = true; });
+    return allGames().filter(function (g) {
+      return g.st === "fixture" && g.d >= addDays(today, -1) && g.d <= addDays(today, 7) && !(g.src === "club" ? liveIds[g.id] : liveKeys[vkey(g)]);
+    })
       .sort(function (a, b) { return (a.d + (a.t || "")).localeCompare(b.d + (b.t || "")); });
   }
 
@@ -557,7 +565,8 @@
       '<div id="setup-other" class="tsgrid"' + (c.length ? " hidden" : "") + ">" +
       '<div class="field"><label for="setup-team">Team</label><select id="setup-team">' + teamOpts + "</select></div>" +
       '<div class="field"><label for="setup-opp">Opponent</label><input id="setup-opp" autocomplete="off" placeholder="e.g. Lavey"></div>' +
-      '<div class="field"><label for="setup-venue">Venue</label><input id="setup-venue" autocomplete="off" placeholder="e.g. Watty Graham Park"></div></div>' +
+      '<div class="field"><label for="setup-venue">Venue</label><input id="setup-venue" autocomplete="off" placeholder="e.g. Watty Graham Park"></div>' +
+      '<div class="field"><label for="setup-ha">Home or away</label><select id="setup-ha"><option value="H">Home</option><option value="A">Away</option><option value="N">Neutral</option></select></div></div>' +
       '<div class="field"><label for="setup-half">Length of each half</label><select id="setup-half">' +
       '<option value="30">30 minutes</option><option value="25">25 minutes</option><option value="20">20 minutes</option><option value="35">35 minutes</option><option value="15">15 minutes</option></select></div>' +
       '<div class="btnrow"><button type="button" class="pbtn" data-act="setup">Set up live game</button>' +
@@ -672,7 +681,7 @@
     renderNext(today, s.upcoming);
     /* keep anything typed into the "start another game" form across live updates */
     const keep = {};
-    ["setup-fixture", "setup-team", "setup-opp", "setup-venue", "setup-half"].forEach(function (id) { const el = $("#" + id); if (el) keep[id] = el.value; });
+    ["setup-fixture", "setup-team", "setup-opp", "setup-venue", "setup-ha", "setup-half"].forEach(function (id) { const el = $("#" + id); if (el) keep[id] = el.value; });
     $("#view").innerHTML = state.tab === "fixtures" ? fixturesHtml(s, today) : state.tab === "results" ? resultsHtml(s) : liveHtml();
     Object.keys(keep).forEach(function (id) { const el = $("#" + id); if (el && keep[id] !== undefined) el.value = keep[id]; });
     const so = $("#setup-other"), sf = $("#setup-fixture");
@@ -889,14 +898,68 @@
     }
   }
 
+  /* ---------- full-time results ---------- */
+  /* Where a finished live game's score goes: the club game it came from, the official fixture it matches, or a new club game */
+  function resultTarget(m) {
+    if (m.gid) return { kind: "club", id: m.gid };
+    let key = m.gkey;
+    if (!key) {
+      const g = DATA.games.filter(function (x) {
+        return x.d === m.d && x.team === m.team && String(x.opp).toLowerCase() === String(m.opp).toLowerCase();
+      })[0];
+      if (g) key = vkey(g);
+    }
+    return key ? { kind: "official", key: key } : { kind: "new" };
+  }
+  function addResult(m, events, upd) {
+    const us = gp(tally(events, "glen")), them = gp(tally(events, "opp"));
+    const t = resultTarget(m);
+    if (t.kind === "club") {
+      upd["fixtures/" + t.id + "/us"] = us;
+      upd["fixtures/" + t.id + "/them"] = them;
+      upd["fixtures/" + t.id + "/st"] = "result";
+    } else if (t.kind === "official") {
+      upd["results/" + t.key] = { us: us, them: them, at: firebase.database.ServerValue.TIMESTAMP };
+    } else {
+      const k = liveRef("fixtures").push().key;
+      const g = { team: m.team, opp: m.opp, d: m.d || londonToday(), comp: m.comp || "Challenge match", round: "",
+        venue: m.venue || "TBC", ha: m.ha || "N", st: "result", us: us, them: them };
+      if (m.t) g.t = m.t;
+      if (m.mapUrl) g.map = m.mapUrl;
+      upd["fixtures/" + k] = g;
+      upd[m.path + "/gid"] = k;
+      upd[m.path + "/autoGid"] = true;
+    }
+    return upd;
+  }
+  function removeResult(m, upd) {
+    const t = resultTarget(m);
+    if (t.kind === "club" && m.autoGid) {
+      upd["fixtures/" + t.id] = null;
+      upd[m.path + "/gid"] = null;
+      upd[m.path + "/autoGid"] = null;
+    } else if (t.kind === "club") {
+      upd["fixtures/" + t.id + "/st"] = "fixture";
+      upd["fixtures/" + t.id + "/us"] = null;
+      upd["fixtures/" + t.id + "/them"] = null;
+    } else if (t.kind === "official") {
+      upd["results/" + t.key] = null;
+    }
+    return upd;
+  }
+
   /* ---------- actions ---------- */
   function addScore(m, side, kind, no, player) {
     const at = now();
     closeSheet();
-    save(mref(m, "events").push({
-      side: side, type: kind, no: no || null, player: player || "",
-      half: m.clock.h2 ? 2 : 1, min: minuteAt(m, at), at: at
-    }), (side === "glen" ? "Glen " : m.opp + " ") + KINDS[kind].label.toLowerCase() + " added");
+    const ev = { side: side, type: kind, no: no || null, player: player || "", half: m.clock.h2 ? 2 : 1, min: minuteAt(m, at), at: at };
+    const msg = (side === "glen" ? "Glen " : m.opp + " ") + KINDS[kind].label.toLowerCase() + " added";
+    if (phase(m) !== "ft") { save(mref(m, "events").push(ev), msg); return; }
+    /* a score added after full-time also corrects the saved result */
+    const r = mref(m, "events").push();
+    const upd = {};
+    upd[m.path + "/events/" + r.key] = ev;
+    save(liveRef().update(addResult(m, m.events.concat([ev]), upd)), msg + ". Result updated.");
   }
   function armed(btn, label) {
     if (btn.dataset.armed === "1") return true;
@@ -976,18 +1039,22 @@
       if (!key) return;
       const upd = {};
       upd[m.path + "/clock/" + key] = firebase.database.ServerValue.TIMESTAMP;
-      if (key === "ft" && m.gid) {
-        upd["fixtures/" + m.gid + "/us"] = gp(tally(m.events, "glen"));
-        upd["fixtures/" + m.gid + "/them"] = gp(tally(m.events, "opp"));
-        upd["fixtures/" + m.gid + "/st"] = "result";
-      }
-      save(liveRef().update(upd), key === "ft" && m.gid ? "Full-time. Result saved to the game." : msg);
+      if (key === "ft") addResult(m, m.events, upd);
+      save(liveRef().update(upd), key === "ft" ? "Full-time. The result is now on the Results tab." : msg);
     } else if (act === "unphase" && m) {
       const k = ["ft", "h2", "ht", "h1"].filter(function (x) { return m.clock[x]; })[0];
-      if (k) save(mref(m, "clock/" + k).remove(), "Undone");
+      if (!k) return;
+      const upd = {};
+      upd[m.path + "/clock/" + k] = null;
+      if (k === "ft") removeResult(m, upd);
+      save(liveRef().update(upd), k === "ft" ? "Full-time undone. The result is off Results until you tap Full-time again." : "Undone");
     } else if (act === "rm" && m) {
       if (!armed(b, "Tap again to remove")) return;
-      save(mref(m, "events/" + b.dataset.id).remove(), "Score removed");
+      if (phase(m) !== "ft") { save(mref(m, "events/" + b.dataset.id).remove(), "Score removed"); return; }
+      const upd = {};
+      upd[m.path + "/events/" + b.dataset.id] = null;
+      const left = m.events.filter(function (e) { return e.id !== b.dataset.id; });
+      save(liveRef().update(addResult(m, left, upd)), "Score removed. Result updated.");
     } else if (act === "sheet" && m) openTeamSheet(m.team);
     else if (act === "sheet-setup") {
       const v = $("#setup-fixture").value;
@@ -1004,14 +1071,14 @@
       if (v === "other") {
         const opp = $("#setup-opp").value.trim();
         if (!opp) { toast("Add the opponent's name first."); $("#setup-opp").focus(); return; }
-        match = { team: $("#setup-team").value, opp: opp.slice(0, 40), comp: "Challenge match", venue: $("#setup-venue").value.trim().slice(0, 60), d: londonToday() };
+        match = { team: $("#setup-team").value, opp: opp.slice(0, 40), comp: "Challenge match", venue: $("#setup-venue").value.trim().slice(0, 60), d: londonToday(), ha: $("#setup-ha").value || "H" };
       } else {
         const g = setupCandidates()[+v];
         const vv = venueOf(g);
-        match = { team: g.team, opp: g.opp, comp: compLine(g), venue: vv.name || "", d: g.d, gkey: vkey(g) };
+        match = { team: g.team, opp: g.opp, comp: compLine(g), venue: vv.name || "", d: g.d, gkey: vkey(g), ha: g.ha || "N" };
         if (vv.url) match.mapUrl = vv.url;
         if (g.t) match.t = g.t;
-        if (g.src === "club") match.gid = g.id;
+        if (g.src === "club") { match.gid = g.id; delete match.gkey; }
       }
       match.half = +$("#setup-half").value || 30;
       const r = liveRef("matches").push();
