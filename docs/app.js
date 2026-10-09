@@ -536,14 +536,49 @@
       (g.t ? " at " + esc(g.t) : "") + ". Follow the score here while it's on.";
   }
 
+  /* Club jerseys for the pitch, seen from the back: outfield green with the gold band, gold shoulder stripes, white collar and cuffs; goalkeeper yellow with a black collar. No sponsor or maker logos. */
+  const JPATH = "M37 5C42 9.5 58 9.5 63 5L80 10L98 33L86 44L78 36L78 91Q50 95 22 91L22 36L14 44L2 33L20 10Z";
+  function mirror(pts) { return pts.map(function (p) { return [100 - p[0], p[1]]; }); }
+  function poly(pts) { return pts.map(function (p) { return p[0] + " " + p[1]; }).join(" "); }
+  const STRIPE_L1 = [[37, 9.5], [21.2, 14.3], [5.4, 35.8]], STRIPE_L2 = [[37, 13.3], [22.6, 18], [8.6, 38.8]];
+  const CUFF_L = [[2, 33], [14, 44], [17.6, 40.2], [5.6, 29.2]];
+  const JERSEY_DEFS =
+    '<svg class="jdefs" aria-hidden="true" focusable="false" width="0" height="0" style="position:absolute;overflow:hidden">' +
+    '<defs><clipPath id="jbody"><path d="' + JPATH + '"/></clipPath>' +
+    /* outfield: green, gold band across the back, gold shoulder stripes, white collar and cuffs */
+    '<symbol id="jer-out" viewBox="0 0 100 96">' +
+    '<path d="' + JPATH + '" fill="#2E9E46"/>' +
+    '<g clip-path="url(#jbody)">' +
+    '<rect x="22" y="39" width="56" height="15" fill="#F2B51F"/>' +
+    '<g fill="none" stroke="#F2B51F" stroke-width="2.4" stroke-linejoin="round">' +
+    '<polyline points="' + poly(STRIPE_L1) + '"/><polyline points="' + poly(STRIPE_L2) + '"/>' +
+    '<polyline points="' + poly(mirror(STRIPE_L1)) + '"/><polyline points="' + poly(mirror(STRIPE_L2)) + '"/></g>' +
+    '<polygon points="' + poly(CUFF_L) + '" fill="#FFFFFF"/><polygon points="' + poly(mirror(CUFF_L)) + '" fill="#FFFFFF"/>' +
+    '<path d="M35 3.5C42 12 58 12 65 3.5" fill="none" stroke="#FFFFFF" stroke-width="5"/></g>' +
+    '<path d="' + JPATH + '" fill="none" stroke="#08361C" stroke-width="2.2" stroke-linejoin="round"/></symbol>' +
+    /* goalkeeper: yellow with a black band round the collar */
+    '<symbol id="jer-gk" viewBox="0 0 100 96">' +
+    '<path d="' + JPATH + '" fill="#F7D21B"/>' +
+    '<g clip-path="url(#jbody)"><path d="M35 3.5C42 12 58 12 65 3.5" fill="none" stroke="#111111" stroke-width="6"/></g>' +
+    '<path d="' + JPATH + '" fill="none" stroke="#4A3B00" stroke-width="2.2" stroke-linejoin="round"/></symbol>' +
+    "</defs></svg>";
+  function jerseySvg(no, gk) {
+    const n = String(no == null ? "" : no);
+    const fs = n.length > 1 ? 36 : 40;
+    return '<svg class="jsvg" viewBox="0 0 100 96" aria-hidden="true" focusable="false"><use href="#' + (gk ? "jer-gk" : "jer-out") + '"/>' +
+      '<text x="50" y="' + (gk ? 68 : 69) + '" text-anchor="middle" font-size="' + fs + '" class="' + (gk ? "jn gk" : "jn") + '">' + n + "</text></svg>";
+  }
+
   function pitchHtml(m) {
     const now = lineupNow(m);
     const tallies = playerTallies(m.events);
     const slots = POS.map(function (p) {
       const s = now.field[p.n];
       const t = s.name && tallies[s.name];
+      const no = s.no || p.n;
       return '<div class="slot' + (s.sub ? " in" : "") + '" style="left:' + p.x + "%;top:" + p.y + '%">' +
-        '<span class="no"' + (s.sub ? ' title="Came on as a sub"' : "") + ">" + (s.no || p.n) + "</span>" +
+        '<span class="jer"' + (s.sub ? ' title="Came on as a sub"' : "") + ">" + jerseySvg(no, p.n === 1) +
+        (s.sub ? '<span class="inb" aria-hidden="true">↑</span>' : "") + '<span class="sr">No. ' + no + (s.sub ? ", came on as a sub" : "") + ", </span></span>" +
         '<span class="nm">' + (s.name ? esc(s.name) : '<span class="tbc">' + esc(p.pos) + "</span>") + "</span>" +
         (t ? '<span class="tl" title="Scored ' + gp(t) + '">' + gp(t) + "</span>" : "") + "</div>";
     }).join("");
@@ -553,7 +588,7 @@
         (t ? '<span class="tl">' + gp(t) + "</span>" : "") +
         (s.off ? '<span class="offm">off ' + (s.off.ht ? "HT" : minLabel(s.off.min, m.half)) + "</span>" : "") + "</li>";
     }).join("");
-    return '<div class="pitch" role="img" aria-label="' + esc(teamName(m.team)) + ' team on the pitch">' + PITCH_SVG + slots + "</div>" +
+    return JERSEY_DEFS + '<div class="pitch" role="img" aria-label="' + esc(teamName(m.team)) + ' team on the pitch">' + PITCH_SVG + slots + "</div>" +
       (bench ? '<ul class="subs" aria-label="Bench">' + bench + "</ul>" : "");
   }
 
