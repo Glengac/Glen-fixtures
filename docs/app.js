@@ -5,7 +5,8 @@
      lineups/<team> team sheets
      fixtures/<id>  games the club adds itself
      venues/<key>   venue and map link set by the club for official games with a TBC venue
-   Scorer logins are listed under /scorers (only the club admin can change that list). */
+   Scorer logins are listed under /scorers. Admins (the main club admin plus anyone marked true under /admins)
+   can change that list; only the main club admin can change /admins. */
 (function () {
   "use strict";
 
@@ -15,6 +16,8 @@
   const OWNER_UID = "huUQRRNXqbQIk0spwd1xrh2rDi43";
   /* Scorers set up directly in Firebase before the Manage scorers screen existed */
   const EARLIER_SCORERS = ["O1DlcvchPgTdWO4jDEgqVyvV5gl2", "h2kq4KzWhtfSpWFb7U10XC8kcWz2"];
+  /* Made admins the first time the main club admin signs in after /admins exists in the rules */
+  const FIRST_ADMINS = ["O1DlcvchPgTdWO4jDEgqVyvV5gl2"];
 
   let DATA = { updated: null, teams: [], games: [] };
   let TEAMS = {};
@@ -22,8 +25,8 @@
   let dataState = "loading";        // loading | ready | error
   let liveState = CFG ? "loading" : "off"; // off | loading | ready | error
   let db = null, auth = null, user = null, adderApp = null;
-  let role = "none";                // none | checking | scorer | owner | not-scorer
-  let SCORERS = null, scorersBlocked = false, roleRef = null, roleCb = null;
+  let role = "none";                // none | checking | scorer | admin | owner | not-scorer
+  let SCORERS = null, scorersBlocked = false, ADMINS = null, adminsBlocked = false, watchers = [];
   let serverOffset = 0, online = true, sheetKind = null;
   const now = function () { return Date.now() + serverOffset; };
 
@@ -317,8 +320,16 @@
     if (t === "results" || t === "live" || t === "fixtures") { state.tab = t; tabChosen = true; }
   } catch (e) {}
   if (!tabChosen && (location.hash === "#results" || location.hash === "#live")) { state.tab = location.hash.slice(1); tabChosen = true; }
-  function canScore() { return !!user && (role === "owner" || role === "scorer"); }
-  function isOwner() { return !!user && role === "owner"; }
+  function canScore() { return !!user && (role === "owner" || role === "admin" || role === "scorer"); }
+  /* admins (and the main club admin) manage scorers; only the main club admin makes or removes admins */
+  function isAdmin() { return !!user && (role === "owner" || role === "admin"); }
+  function isMainAdmin() { return !!user && role === "owner"; }
+  function adminIds() {
+    const out = {};
+    out[OWNER_UID] = true;
+    Object.keys(ADMINS || {}).forEach(function (id) { if (ADMINS[id] === true) out[id] = true; });
+    return out;
+  }
 
   /* ---------- shell ---------- */
   const app = $("#app");
@@ -715,7 +726,7 @@
     if (!auth) { fa.innerHTML = ""; return; }
     const out = '<button type="button" class="linkbtn" data-act="signout">Sign out</button>';
     if (!user) fa.innerHTML = '<button type="button" class="linkbtn" data-act="signin">Scorer sign-in</button>';
-    else if (role === "owner") fa.innerHTML = "<span>Signed in as club admin</span>" +
+    else if (role === "owner" || role === "admin") fa.innerHTML = "<span>Signed in as club admin</span>" +
       '<button type="button" class="linkbtn" data-act="manage">Manage scorers</button>' + out;
     else if (role === "scorer") fa.innerHTML = "<span>Signed in as scorer</span>" + out;
     else if (role === "not-scorer") fa.innerHTML = "<span>This login isn't set up as a scorer. Ask the club to add you.</span>" + out;
@@ -899,29 +910,40 @@
 
   /* ---------- manage scorers (club admin only) ---------- */
   function openManage(msg) {
-    if (!isOwner()) return;
+    if (!isAdmin()) return;
     let list;
     if (scorersBlocked) {
       list = '<p class="netnote">Publish the new database rules in Firebase first, then refresh this page.</p>';
     } else if (!SCORERS) {
       list = '<p class="hint">Loading scorers…</p>';
     } else {
-      const ids = Object.keys(SCORERS).sort(function (a, b) {
-        return (a === OWNER_UID ? -1 : b === OWNER_UID ? 1 : 0) || String(SCORERS[a].name || "").localeCompare(String(SCORERS[b].name || ""));
+      const adm = adminIds();
+      const all = Object.assign({}, adm, SCORERS);
+      const ids = Object.keys(all).sort(function (a, b) {
+        return (a === OWNER_UID ? -1 : b === OWNER_UID ? 1 : 0) || ((adm[b] ? 1 : 0) - (adm[a] ? 1 : 0)) ||
+          String((SCORERS[a] || {}).name || "").localeCompare(String((SCORERS[b] || {}).name || ""));
       });
+      const main = isMainAdmin();
       list = '<ul class="slist">' + ids.map(function (id) {
         const s = SCORERS[id] || {};
-        const me = id === OWNER_UID;
-        return '<li><span class="nm">' + esc(s.name || "Scorer") + (me ? " (you)" : "") + "</span>" +
+        const me = user && id === user.uid, isMain = id === OWNER_UID, isAdm = !!adm[id];
+        const btns = [];
+        if (!me && !isMain) {
+          if (s.email) btns.push('<button type="button" class="linkbtn" data-act="sreset" data-uid="' + esc(id) + '">Send password reset</button>');
+          if (main && !adminsBlocked) btns.push(isAdm
+            ? '<button type="button" class="linkbtn" data-act="sunadmin" data-uid="' + esc(id) + '">Remove admin</button>'
+            : '<button type="button" class="linkbtn" data-act="sadmin" data-uid="' + esc(id) + '">Make admin</button>');
+          if (main || !isAdm) btns.push('<button type="button" class="linkbtn danger" data-act="sremove" data-uid="' + esc(id) + '">Remove</button>');
+        }
+        return '<li><span class="nm">' + esc(s.name || (isMain ? "Club admin" : isAdm ? "Admin" : "Scorer")) + (me ? " (you)" : "") +
+          (isAdm ? ' <span class="chip admin">' + (isMain ? "Main admin" : "Admin") + "</span>" : "") + "</span>" +
           '<span class="em">' + (s.email ? esc(s.email) : "No email saved · User UID " + esc(id)) + "</span>" +
-          (me ? "" : '<span class="btnrow">' +
-            (s.email ? '<button type="button" class="linkbtn" data-act="sreset" data-uid="' + esc(id) + '">Send password reset</button>' : "") +
-            '<button type="button" class="linkbtn danger" data-act="sremove" data-uid="' + esc(id) + '">Remove</button></span>') +
-          "</li>";
-      }).join("") + "</ul>";
+          (btns.length ? '<span class="btnrow">' + btns.join("") + "</span>" : "") + "</li>";
+      }).join("") + "</ul>" +
+      (main && adminsBlocked ? '<p class="netnote">To make other people admins, publish the new database rules in Firebase, then refresh this page.</p>' : "");
     }
     openSheet('<h2 id="sheet-title">Manage scorers</h2>' +
-      '<p class="hint">Scorers can run live games, set venues, add games and edit team sheets. Only you see this screen.</p>' +
+      '<p class="hint">Scorers can run live games, set venues, add games and edit team sheets. Admins can also add and remove scorers. Only admins see this screen.</p>' +
       (msg ? '<p class="okmsg">' + esc(msg) + "</p>" : "") + list +
       "<h3>Add a scorer</h3>" +
       '<form id="s-form">' +
@@ -961,33 +983,68 @@
     if (/permission/i.test(c + (err && err.message))) return "The login was made, but saving them as a scorer was refused. Publish the new database rules, then add them by User UID.";
     return "That didn't work. Check your signal and try again.";
   }
+  function stopWatching() {
+    watchers.forEach(function (w) { w.ref.off("value", w.cb); });
+    watchers = [];
+  }
+  function watch(path, cb, err) {
+    const ref = db.ref(path);
+    ref.on("value", cb, err);
+    watchers.push({ ref: ref, cb: cb });
+  }
+  function refreshManage() { if (sheetKind === "manage") openManage(); render(); }
+  /* the scorers and admins lists, for the main club admin and other admins */
+  function watchLists(u) {
+    watch("scorers", function (s) {
+      SCORERS = s.val() || {};
+      if (!s.exists() && role === "owner") {
+        /* first time: list the club admin and the scorers set up in Firebase earlier */
+        const seed = {};
+        seed[OWNER_UID] = { name: "Club admin", email: u.email || "" };
+        EARLIER_SCORERS.forEach(function (id) { seed[id] = { name: "Scorer added earlier", email: "" }; });
+        db.ref("scorers").update(seed).catch(function () {});
+      }
+      refreshManage();
+    }, function () { scorersBlocked = true; refreshManage(); });
+    watch("admins", function (s) {
+      ADMINS = s.val() || {};
+      if (!s.exists() && role === "owner") {
+        /* first time: make the admins the club asked for (removing one later sets it to false, so this never re-adds them) */
+        const seed = {};
+        FIRST_ADMINS.forEach(function (id) { seed[id] = true; });
+        db.ref("admins").update(seed).catch(function () {});
+      }
+      refreshManage();
+    }, function () { adminsBlocked = true; ADMINS = {}; refreshManage(); });
+  }
   function watchRole(u) {
-    if (roleRef) { roleRef.off("value", roleCb); roleRef = null; roleCb = null; }
-    SCORERS = null; scorersBlocked = false;
+    stopWatching();
+    SCORERS = null; scorersBlocked = false; ADMINS = null; adminsBlocked = false;
     if (!u) { role = "none"; return; }
-    if (u.uid === OWNER_UID) {
-      role = "owner";
-      roleRef = db.ref("scorers");
-      roleCb = function (s) {
-        SCORERS = s.val() || {};
-        if (!s.exists()) {
-          /* first time: list the club admin and the scorers set up in Firebase earlier */
-          const seed = {};
-          seed[OWNER_UID] = { name: "Club admin", email: u.email || "" };
-          EARLIER_SCORERS.forEach(function (id) { seed[id] = { name: "Scorer added earlier", email: "" }; });
-          db.ref("scorers").update(seed).catch(function () {});
-        }
-        if (sheetKind === "manage") openManage();
+    if (u.uid === OWNER_UID) { role = "owner"; watchLists(u); return; }
+    role = "checking";
+    let scorerWatched = false;
+    const asScorer = function () {
+      if (scorerWatched) return;
+      scorerWatched = true;
+      watch("scorers/" + u.uid, function (s) {
+        if (role === "admin") return;
+        role = s.exists() ? "scorer" : "not-scorer";
         render();
-      };
-      roleRef.on("value", roleCb, function () { scorersBlocked = true; if (sheetKind === "manage") openManage(); render(); });
-    } else {
-      role = "checking";
-      roleRef = db.ref("scorers/" + u.uid);
-      roleCb = function (s) { role = s.exists() ? "scorer" : "not-scorer"; render(); };
-      /* before the scorers list existed, the database rules alone decided; let a refused save tell them */
-      roleRef.on("value", roleCb, function () { role = "scorer"; render(); });
-    }
+      }, function () {
+        /* before the scorers list existed, the database rules alone decided; let a refused save tell them */
+        if (role !== "admin") { role = "scorer"; render(); }
+      });
+    };
+    watch("admins/" + u.uid, function (s) {
+      if (s.val() === true) {
+        if (role !== "admin") { role = "admin"; watchLists(u); }
+        render();
+      } else if (role === "admin") {
+        /* no longer an admin: start again as a scorer */
+        setTimeout(function () { if (user && user.uid === u.uid) { watchRole(u); render(); } }, 0);
+      } else asScorer();
+    }, function () { asScorer(); });
   }
 
   /* ---------- full-time results ---------- */
@@ -1093,16 +1150,29 @@
       return;
     }
     if (act === "manage") { openManage(); return; }
-    if (act === "sreset" && isOwner()) {
+    if (act === "sreset" && isAdmin()) {
       const s = (SCORERS || {})[b.dataset.uid];
       if (s && s.email) auth.sendPasswordResetEmail(s.email).then(function () { openManage("Password reset email sent to " + s.email + "."); })
         .catch(function () { toast("Couldn't send the reset email. Try again in a minute."); });
       return;
     }
-    if (act === "sremove" && isOwner()) {
+    if (act === "sremove" && isAdmin()) {
       if (!armed(b, "Tap again to remove")) return;
-      db.ref("scorers/" + b.dataset.uid).remove().then(function () { openManage("Removed. They can no longer change scores."); })
+      const upd = {};
+      upd["scorers/" + b.dataset.uid] = null;
+      /* the main club admin's remove also takes away admin */
+      if (isMainAdmin() && !adminsBlocked && ADMINS && ADMINS[b.dataset.uid] === true) upd["admins/" + b.dataset.uid] = false;
+      db.ref().update(upd).then(function () { openManage("Removed. They can no longer change scores."); })
         .catch(function () { toast("That didn't save. Try again."); });
+      return;
+    }
+    if ((act === "sadmin" || act === "sunadmin") && isMainAdmin()) {
+      const uid = b.dataset.uid, on = act === "sadmin";
+      const nm = ((SCORERS || {})[uid] || {}).name || "They";
+      db.ref("admins/" + uid).set(on).then(function () {
+        openManage(on ? nm + " is now an admin. They'll see Manage scorers at the bottom of the site when they're signed in."
+                      : nm + " is no longer an admin. They can still score.");
+      }).catch(function () { toast("That didn't save. Publish the new database rules, then try again."); });
       return;
     }
     if (act === "suboff" || act === "subon") {
@@ -1280,7 +1350,7 @@
       save(liveRef("lineups/" + team).set(lu), "Team sheet saved");
     } else if (form.id === "s-form") {
       ev.preventDefault();
-      if (!isOwner()) return;
+      if (!isAdmin()) return;
       const name = val("s-name").slice(0, 40), email = val("s-email"), pass = $("#s-pass").value;
       if (!name || !email) return fail("s-err", "Add their name and email.");
       if (pass.length < 6) return fail("s-err", "Use a password with at least 6 characters.");
@@ -1294,7 +1364,7 @@
       });
     } else if (form.id === "u-form") {
       ev.preventDefault();
-      if (!isOwner()) return;
+      if (!isAdmin()) return;
       const name = val("u-name").slice(0, 40), uid = val("u-uid");
       if (!/^[A-Za-z0-9]{20,40}$/.test(uid)) return fail("u-err", "That doesn't look like a User UID. Copy it from Firebase, Authentication, Users.");
       db.ref("scorers/" + uid).set({ name: name || "Scorer", email: "" }).then(function () { openManage(name + " added as a scorer."); })

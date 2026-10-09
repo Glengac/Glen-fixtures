@@ -485,3 +485,4 @@ footer p { margin: 0; }
 .players.compact button { min-height: 42px; padding: 6px 7px; gap: 5px; font-size: 0.9rem; line-height: 1.15; }
 .players.compact button b { font-size: 1rem; min-width: 1.1em; }
 @media (min-width: 640px) { .players.compact { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.chip.admin { background: var(--gold-bg); color: var(--gold-ink); vertical-align: 1px; margin-left: 4px; }

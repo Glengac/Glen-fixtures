@@ -5,8 +5,34 @@ Fixtures, results and live scores for every Watty Graham's GAC Glen team.
 - **Website files** are in `docs/` and are served by GitHub Pages (Settings > Pages > Deploy from a branch > `main` / `docs`).
 - **Fixtures and results** live in `docs/fixtures.json`. A scheduled Claude task refreshes it every two hours (8am to midnight) from Derry GAA and Ulster LGFA.
 - **Team calendars** (`docs/cal/*.ics`) are rebuilt from the fixtures with `python3 tools/build_calendars.py`. People subscribe to them from the Fixtures tab, and their calendar keeps itself up to date.
-- **Live scores, team sheets, club-added games and venues set for TBC games** are stored in Firebase Realtime Database under `/live`. Anyone can read them; only the club admin and the logins listed under `/scorers` can change them. Several games can be live at once (`/live/matches`). The Firebase settings go in `docs/firebase-config.js`.
-- **Scorers** are managed on the site: the club admin signs in and taps **Manage scorers** at the bottom to create a login, send a password reset or remove someone.
+- **Live scores, team sheets, club-added games and venues set for TBC games** are stored in Firebase Realtime Database under `/live`. Anyone can read them; only admins and the logins listed under `/scorers` can change them. Several games can be live at once (`/live/matches`). The Firebase settings go in `docs/firebase-config.js`.
+- **Scorers** are managed on the site: an admin signs in and taps **Manage scorers** at the bottom to create a login, send a password reset or remove someone.
+- **Admins** are the main club admin (fixed in the rules and in `docs/app.js`) plus anyone set to `true` under `/admins`. Only the main club admin can make or remove admins, with **Make admin** / **Remove admin** on the Manage scorers screen. Removing an admin sets them to `false`, so they aren't re-added.
+
+Database rules (Firebase, Realtime Database, Rules):
+
+```json
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "live": {
+      ".read": true,
+      ".write": "auth != null && (auth.uid === 'huUQRRNXqbQIk0spwd1xrh2rDi43' || root.child('admins').child(auth.uid).val() === true || root.child('scorers').child(auth.uid).exists())"
+    },
+    "scorers": {
+      ".read": "auth != null && (auth.uid === 'huUQRRNXqbQIk0spwd1xrh2rDi43' || root.child('admins').child(auth.uid).val() === true)",
+      ".write": "auth != null && (auth.uid === 'huUQRRNXqbQIk0spwd1xrh2rDi43' || root.child('admins').child(auth.uid).val() === true)",
+      "$uid": { ".read": "auth != null && auth.uid === $uid" }
+    },
+    "admins": {
+      ".read": "auth != null && (auth.uid === 'huUQRRNXqbQIk0spwd1xrh2rDi43' || root.child('admins').child(auth.uid).val() === true)",
+      ".write": "auth != null && auth.uid === 'huUQRRNXqbQIk0spwd1xrh2rDi43'",
+      "$uid": { ".read": "auth != null && auth.uid === $uid", ".validate": "newData.isBoolean()" }
+    }
+  }
+}
+```
 
 ## Scoring a game
 
