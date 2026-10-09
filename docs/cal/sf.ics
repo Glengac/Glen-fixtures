@@ -3,66 +3,66 @@ VERSION:2.0
 PRODID:-//Glen fixtures//EN
 CALSCALE:GREGORIAN
 METHOD:PUBLISH
-X-WR-CALNAME:Glen · Senior Football
+X-WR-CALNAME:An Gleann · Senior Football
 X-WR-TIMEZONE:Europe/London
 REFRESH-INTERVAL;VALUE=DURATION:PT12H
 X-PUBLISHED-TTL:PT12H
 BEGIN:VEVENT
 UID:2026-08-02-sf-faughanvale@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260802T133000Z
 DTEND:20260802T150000Z
-SUMMARY:Glen 2-19 v 1-14 Faughanvale (Senior Football)
+SUMMARY:An Gleann 2-19 v 1-14 Faughanvale (Senior Football)
 DESCRIPTION:Division 1 Football League · Round 14\nCheck for time or venue
   changes before you travel.
 LOCATION:Faughanvale
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-08-09-sf-swatragh@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260809T133000Z
 DTEND:20260809T150000Z
-SUMMARY:Glen 3-17 v 2-15 Swatragh (Senior Football)
+SUMMARY:An Gleann 3-17 v 2-15 Swatragh (Senior Football)
 DESCRIPTION:Division 1 Football League · Round 15\nCheck for time or venue
   changes before you travel.
 LOCATION:Watty Graham Park\, Maghera
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-08-30-sf-banagher@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260830T124500Z
 DTEND:20260830T141500Z
-SUMMARY:Glen 2-20 v 4-7 Banagher (Senior Football)
+SUMMARY:An Gleann 2-20 v 4-7 Banagher (Senior Football)
 DESCRIPTION:O'Neills Senior Football Championship · Round 1\nCheck for tim
  e or venue changes before you travel.
 LOCATION:Owenbeg Derry GAA Centre of Excellence
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-09-06-sf-bellaghy@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260906T170000Z
 DTEND:20260906T183000Z
-SUMMARY:Glen 3-20 v 0-11 Bellaghy (Senior Football)
+SUMMARY:An Gleann 3-20 v 0-11 Bellaghy (Senior Football)
 DESCRIPTION:O'Neills Senior Football Championship · Q1a\nCheck for time or
   venue changes before you travel.
 LOCATION:Owenbeg Derry GAA Centre of Excellence
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-10-03-sf-kilrea@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20261003T150000Z
 DTEND:20261003T163000Z
-SUMMARY:Glen 1-16 v 1-6 Kilrea (Senior Football)
+SUMMARY:An Gleann 1-16 v 1-6 Kilrea (Senior Football)
 DESCRIPTION:O'Neills Senior Football Championship · Quarter-final\nCheck f
  or time or venue changes before you travel.
 LOCATION:Owenbeg Derry GAA Centre of Excellence
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-10-11-sf-newbridge@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20261011T150000Z
 DTEND:20261011T163000Z
-SUMMARY:Glen v Newbridge (Senior Football)
+SUMMARY:An Gleann v Newbridge (Senior Football)
 DESCRIPTION:O'Neills Senior Football Championship · Semi-final\nCheck for 
  time or venue changes before you travel.
 LOCATION:Owenbeg Derry GAA Centre of Excellence

@@ -1,6 +1,6 @@
-# Glen fixtures & results
+# An Gleann fixtures & results
 
-Fixtures, results and live scores for every Watty Graham's GAC Glen team.
+Fixtures, results and live scores for every Watty Graham's GAC An Gleann team.
 
 - **Website files** are in `docs/` and are served by GitHub Pages (Settings > Pages > Deploy from a branch > `main` / `docs`).
 - **Fixtures and results** live in `docs/fixtures.json`. A scheduled Claude task refreshes it every two hours (8am to midnight) from Derry GAA and Ulster LGFA.

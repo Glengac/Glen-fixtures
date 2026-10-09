@@ -1,4 +1,4 @@
-/* Glen fixtures, results and live scores.
+/* An Gleann (Watty Graham's GAC Glen) fixtures, results and live scores.
    Fixtures come from fixtures.json (refreshed from Derry GAA and Ulster LGFA every two hours).
    Live data lives in Firebase Realtime Database under /live:
      matches/<id>   live games (several can run at once; /live/match is the older single-game slot)
@@ -113,7 +113,7 @@
   }
   function compLine(g) { return g.comp + (g.round ? " · " + g.round : ""); }
   function isFinal(g) { return /(^|· )Final$/.test(g.round || ""); }
-  function teamName(id) { return TEAMS[id] ? TEAMS[id].name : "Glen"; }
+  function teamName(id) { return TEAMS[id] ? TEAMS[id].name : "An Gleann"; }
   function relDay(today, iso) {
     const n = daysBetween(today, iso);
     if (n === 0) return "Today";
@@ -160,7 +160,7 @@
     const start = londonToUTC(g.d, g.t);
     const end = new Date(start.getTime() + 90 * 60000);
     const gfmt = function (d) { return d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, ""); };
-    const title = "Glen v " + g.opp + " (" + teamName(g.team) + ")";
+    const title = "An Gleann v " + g.opp + " (" + teamName(g.team) + ")";
     const v = venueOf(g);
     const details = compLine(g) + (v.url ? "\nMap: " + v.url : "") + "\nCheck for time or venue changes before you travel.";
     const loc = v.name ? (v.typed ? v.name : (VENUE_QUERY[v.name] || v.name)) : "";
@@ -334,8 +334,8 @@
   /* ---------- shell ---------- */
   const app = $("#app");
   app.innerHTML =
-    '<header class="masthead"><img src="crest.jpg" alt="Watty Graham\'s GAC Glen crest" width="76" height="76">' +
-    '<div><p class="club">Watty Graham\'s GAC Glen</p><h1>Fixtures &amp; results</h1><p class="irish">Machaire Rátha · Doire</p></div></header>' +
+    '<header class="masthead"><img src="crest.jpg" alt="Watty Graham\'s GAC An Gleann crest" width="76" height="76">' +
+    '<div><p class="club">Watty Graham\'s GAC An Gleann</p><h1>Fixtures &amp; results</h1><p class="irish">Machaire Rátha · Doire</p></div></header>' +
     '<section id="next" class="panel next" aria-label="Next game" hidden></section>' +
     '<div class="controls"><div class="tabs" role="tablist" aria-label="View">' +
     '<button type="button" role="tab" id="tab-fixtures" data-tab="fixtures">Fixtures <span class="n" id="n-fixtures"></span></button>' +
@@ -402,7 +402,7 @@
   function fixtureRow(g) {
     const cal = calLinks(g);
     return '<article class="game"><div class="body">' + eyebrow(g, false) +
-      '<h3>Glen <span class="v">v</span> ' + esc(g.opp) + "</h3>" +
+      '<h3>An Gleann <span class="v">v</span> ' + esc(g.opp) + "</h3>" +
       '<p class="comp">' + esc(compLine(g)) + "</p>" +
       '<p class="meta"><time>' + esc(g.t || "Time TBC") + '</time><span aria-hidden="true">·</span>' + venueLink(g) +
       ' <span class="chip ha">' + HA[g.ha] + "</span></p>" +
@@ -421,7 +421,7 @@
         '<span class="them">' + esc(g.them) + '<span class="tot">(' + points(g.them) + ")</span></span></div>";
     } else score = '<div class="score"><span class="pending">Result to come</span></div>';
     return '<article class="game"><div class="body">' + eyebrow(g, true) +
-      '<h3>Glen <span class="v">v</span> ' + esc(g.opp) + "</h3>" +
+      '<h3>An Gleann <span class="v">v</span> ' + esc(g.opp) + "</h3>" +
       '<p class="comp">' + esc(compLine(g)) + "</p>" +
       '<p class="meta">' + (g.t ? "<time>" + esc(g.t) + '</time><span aria-hidden="true">·</span>' : "") + venueLink(g) +
       ' <span class="chip ha">' + HA[g.ha] + "</span>" +
@@ -448,7 +448,7 @@
     });
     return '<div class="list">' + html + "</div>";
   }
-  function teamLabel() { return state.team === "all" ? "Glen" : teamName(state.team); }
+  function teamLabel() { return state.team === "all" ? "An Gleann" : teamName(state.team); }
 
   function renderNext(today, upcoming) {
     const el = $("#next");
@@ -459,7 +459,7 @@
     el.innerHTML =
       '<div class="kicker"><span>Next up</span><span class="count">' + esc(relDay(today, g.d)) + "</span>" + (isFinal(g) ? "<span>Final</span>" : "") + "</div>" +
       '<p class="team">' + esc(teamName(g.team)) + " · " + HA[g.ha] + "</p>" +
-      '<h2 class="matchup">Glen<span class="v">v</span>' + esc(g.opp) + "</h2>" +
+      '<h2 class="matchup">An Gleann<span class="v">v</span>' + esc(g.opp) + "</h2>" +
       '<p class="when">' + esc(g.t || "Time TBC") + " <span>· " + esc(fmtDate(g.d, { weekday: "long", day: "numeric", month: "long" })) + "</span></p>" +
       '<p class="comp">' + esc(compLine(g)) + " · " + esc(v.name || (href ? "Venue on map" : "Venue TBC")) + "</p>" +
       '<div class="actions">' +
@@ -473,10 +473,10 @@
   function subscribeHtml() {
     const url = calendarUrl(state.team);
     const google = "https://calendar.google.com/calendar/render?cid=" + encodeURIComponent(url);
-    const who = state.team === "all" ? "every Glen team" : teamName(state.team);
+    const who = state.team === "all" ? "every An Gleann team" : "An Gleann " + teamName(state.team);
     return '<section class="subscribe" aria-label="Subscribe to a calendar">' +
       "<h2>Subscribe to a team calendar</h2>" +
-      "<p>Get " + esc(who) + " fixtures in your calendar. It keeps itself up to date, including time and venue changes. Pick a team above first if you only want one.</p>" +
+      "<p>Get fixtures for " + esc(who) + " in your calendar. It keeps itself up to date, including time and venue changes. Pick a team above first if you only want one.</p>" +
       '<div class="btnrow"><a href="' + esc(url) + '">iPhone, Mac or Outlook</a><a href="' + esc(google) + '" target="_blank" rel="noopener">Google Calendar</a></div>' +
       "</section>";
   }
@@ -490,7 +490,7 @@
       const rest = s.upcoming.slice(1);
       /* the next game sits in the green panel; its venue button lives here so scorers can still reach it */
       const nextTools = vtools(next) || xtools(next);
-      html = nextTools ? '<div class="nexttools"><span>Next up: Glen v ' + esc(next.opp) + "</span>" + nextTools + "</div>" : "";
+      html = nextTools ? '<div class="nexttools"><span>Next up: An Gleann v ' + esc(next.opp) + "</span>" + nextTools + "</div>" : "";
       if (!rest.length) html += '<p class="record">That is the only ' + esc(teamLabel()) + " fixture published so far.</p>";
       else {
         const weekEnd = addDays(today, 7);
@@ -531,7 +531,7 @@
     const today = londonToday();
     const g = allGames().filter(function (x) { return x.st === "fixture" && x.d >= today; })
       .sort(function (a, b) { return (a.d + (a.t || "")).localeCompare(b.d + (b.t || "")); })[0];
-    if (!g) return "Scores appear here while a Glen game is on.";
+    if (!g) return "Scores appear here while An Gleann are playing.";
     return "Next game: " + esc(teamName(g.team)) + " v " + esc(g.opp) + ", " + esc(relDay(today, g.d).toLowerCase()) +
       (g.t ? " at " + esc(g.t) : "") + ". Follow the score here while it's on.";
   }
@@ -565,10 +565,10 @@
       "<span>" + SUB_SVG + "Sub</span></p>";
   }
 
-  /* Two-sided list: Glen's scores and subs on the left, the opposition's on the right, minute and running score down the middle */
+  /* Two-sided list: An Gleann's scores and subs on the left, the opposition's on the right, minute and running score down the middle */
   function feedHtml(m) {
     const subs = m.subs || [];
-    if (!m.events.length && !subs.length) return '<div class="list"><div class="empty">No scores yet. Glen\'s scores show on the left and ' + esc(m.opp) + "'s on the right, with the scorer and the umpire's flag.</div></div>";
+    if (!m.events.length && !subs.length) return '<div class="list"><div class="empty">No scores yet. An Gleann\'s scores show on the left and ' + esc(m.opp) + "'s on the right, with the scorer and the umpire's flag.</div></div>";
     const items = m.events.map(function (e) { return { k: "score", e: e, at: e.at }; })
       .concat(subs.map(function (s) { return { k: "sub", e: s, at: s.at }; }))
       .sort(byAt);
@@ -581,7 +581,7 @@
     });
     items.reverse();
     const scorer = canScore(), mid = ' data-mid="' + esc(m.id) + '"';
-    let html = '<div class="fr fhead"><span class="fs glen">Glen</span><span class="fm">Min</span><span class="fs opp">' + esc(m.opp) + "</span></div>";
+    let html = '<div class="fr fhead"><span class="fs glen">An Gleann</span><span class="fm">Min</span><span class="fs opp">' + esc(m.opp) + "</span></div>";
     let lastHalf = null;
     items.forEach(function (it) {
       const e = it.e;
@@ -655,9 +655,9 @@
       (online ? "" : '<p class="netnote">No signal. Scores you add are kept and sent as soon as you\'re back online.</p>') +
       '<div class="btnrow">' + (next ? '<button type="button" class="pbtn" data-act="phase"' + mid + ">" + next + "</button>" : "") +
       (undo ? '<button type="button" class="linkbtn" data-act="unphase"' + mid + ">" + undo + "</button>" : "") + "</div>" +
-      '<p class="row-label">Glen scored</p>' + btns("glen") +
+      '<p class="row-label">An Gleann scored</p>' + btns("glen") +
       '<p class="row-label">' + esc(m.opp) + " scored</p>" + btns("opp") +
-      '<p class="row-label">Glen subs</p>' +
+      '<p class="row-label">An Gleann subs</p>' +
       '<button type="button" class="sbtn subbtn" data-act="subopen"' + mid + ">" + SUB_SVG + "<span>Make a sub<small>Who's coming off and who's going on</small></span></button>" +
       '<div class="btnrow"><button type="button" class="linkbtn" data-act="sheet"' + mid + ">Edit team sheet</button>" +
       '<button type="button" class="linkbtn danger" data-act="clear"' + mid + ">Clear this game</button></div>" +
@@ -684,7 +684,7 @@
       '<p class="clock" data-clock="' + esc(m.id) + '" aria-label="Match clock">' + esc(clockText(m)) + "</p>" +
       '<p class="team">' + esc(teamName(m.team)) + " · " + esc(m.comp) + "</p>" +
       '<div class="sides">' +
-      '<div class="side glen"><span class="nm">Glen</span><span class="sc">' + gp(us) + '</span><span class="tt">' + us.t + " pts</span></div>" +
+      '<div class="side glen"><span class="nm">An Gleann</span><span class="sc">' + gp(us) + '</span><span class="tt">' + us.t + " pts</span></div>" +
       '<span class="vs">v</span>' +
       '<div class="side"><span class="nm">' + esc(m.opp) + '</span><span class="sc">' + gp(them) + '</span><span class="tt">' + them.t + " pts</span></div>" +
       "</div>" +
@@ -812,7 +812,7 @@
     };
     const onPitch = POS.map(function (p) { return now.field[p.n]; }).filter(function (p) { return p.name; }).map(pbtn).join("");
     const bench = now.spare.map(pbtn).join("");
-    openSheet('<h2 id="sheet-title">' + flagSvg(kind) + "Glen · " + k.label + "</h2>" +
+    openSheet('<h2 id="sheet-title">' + flagSvg(kind) + "An Gleann · " + k.label + "</h2>" +
       (onPitch || bench ? '<p class="hint">Who scored?</p>' + (onPitch ? '<div class="players compact">' + onPitch + "</div>" : "") +
           (bench ? "<h3>Bench</h3>" + '<div class="players compact">' + bench + "</div>" : "")
         : '<p class="hint">Name the team sheet to pick who scored. You can still add the score now.</p>') +
@@ -824,7 +824,7 @@
   function openSubSheet(m) {
     const mid = ' data-mid="' + esc(m.id) + '"';
     if (phase(m) === "pre") {
-      openSheet('<h2 id="sheet-title">' + SUB_SVG + "Glen sub</h2>" +
+      openSheet('<h2 id="sheet-title">' + SUB_SVG + "An Gleann sub</h2>" +
         "<p class=\"hint\">The game hasn't started yet. To change who starts, edit the team sheet. Subs made after throw-in show in the scores list and on the pitch.</p>" +
         '<div class="btnrow"><button type="button" class="pbtn" data-act="sheet"' + mid + '>Edit team sheet</button><button type="button" class="linkbtn" data-act="close">Cancel</button></div>');
       return;
@@ -840,7 +840,7 @@
       return '<button type="button" data-act="subon" data-i="' + i + '" aria-pressed="false"><b>' + (s.no || "") + "</b>" +
         "<span>" + esc(s.name) + (s.off ? " <small>off " + (s.off.ht ? "HT" : minLabel(s.off.min, m.half)) + "</small>" : "") + "</span></button>";
     }).join("");
-    openSheet('<h2 id="sheet-title">' + SUB_SVG + "Glen sub</h2>" +
+    openSheet('<h2 id="sheet-title">' + SUB_SVG + "An Gleann sub</h2>" +
       '<form id="sub-form"' + mid + ">" +
       '<h3 class="subh off">Coming off</h3><div class="players compact" id="sub-off">' + offBtns + "</div>" +
       '<h3 class="subh on">Going on</h3>' +
@@ -872,7 +872,7 @@
       field("x-map", "Google Maps link (optional)", g.map, 'type="url" inputmode="url" autocomplete="off" placeholder="https://maps.app.goo.gl/…"', MAP_HINT) +
       '<div class="field"><label for="x-ha">Home or away</label><select id="x-ha">' + haOpts + "</select></div>" +
       (past || g.us ? "<h3>Result</h3>" +
-        field("x-us", "Glen score (goals-points)", g.us, 'inputmode="numeric" autocomplete="off" placeholder="e.g. 1-12"') +
+        field("x-us", "An Gleann score (goals-points)", g.us, 'inputmode="numeric" autocomplete="off" placeholder="e.g. 1-12"') +
         field("x-them", "Opponent score (goals-points)", g.them, 'inputmode="numeric" autocomplete="off" placeholder="e.g. 0-9"') : "") +
       '<p class="err" id="x-err" hidden></p>' +
       '<div class="btnrow"><button type="submit" class="pbtn">Save game</button><button type="button" class="linkbtn" data-act="close">Cancel</button></div>' +
@@ -882,7 +882,7 @@
     const g = allGames().filter(function (x) { return x.src !== "club" && vkey(x) === key; })[0];
     if (!g) return;
     const o = (LIVE.venues || {})[key] || {};
-    openSheet('<h2 id="sheet-title">Venue · Glen v ' + esc(g.opp) + "</h2>" +
+    openSheet('<h2 id="sheet-title">Venue · An Gleann v ' + esc(g.opp) + "</h2>" +
       '<p class="hint">' + esc(teamName(g.team)) + ", " + esc(fmtDate(g.d, { weekday: "long", day: "numeric", month: "long" })) +
       ". The official listing says TBC. What you set here shows until it's confirmed.</p>" +
       '<form id="v-form" data-key="' + esc(key) + '">' +
@@ -1102,7 +1102,7 @@
     const at = now();
     closeSheet();
     const ev = { side: side, type: kind, no: no || null, player: player || "", half: m.clock.h2 ? 2 : 1, min: minuteAt(m, at), at: at };
-    const msg = (side === "glen" ? "Glen " : m.opp + " ") + KINDS[kind].label.toLowerCase() + " added";
+    const msg = (side === "glen" ? "An Gleann " : m.opp + " ") + KINDS[kind].label.toLowerCase() + " added";
     if (phase(m) !== "ft") { save(mref(m, "events").push(ev), msg); return; }
     /* a score added after full-time also corrects the saved result */
     const r = mref(m, "events").push();

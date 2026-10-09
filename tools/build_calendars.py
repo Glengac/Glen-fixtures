@@ -44,11 +44,11 @@ def slug(text):
 
 
 def event_lines(g, team_name, stamp):
-    title = f"Glen v {g['opp']} ({team_name})"
+    title = f"An Gleann v {g['opp']} ({team_name})"
     if g.get("st") == "result" and g.get("us") and g.get("them"):
-        title = f"Glen {g['us']} v {g['them']} {g['opp']} ({team_name})"
+        title = f"An Gleann {g['us']} v {g['them']} {g['opp']} ({team_name})"
     elif g.get("st") == "walkover":
-        title = f"Glen v {g['opp']} ({team_name}) – walkover"
+        title = f"An Gleann v {g['opp']} ({team_name}) – walkover"
     comp = g['comp'] + (f" · {g['round']}" if g.get('round') else "")
     desc = f"{comp}\nCheck for time or venue changes before you travel."
     loc = "" if g.get("venue") in (None, "", "TBC") else VENUE_QUERY.get(g["venue"], g["venue"])
@@ -75,7 +75,7 @@ def calendar(name, games, teams, stamp):
         "REFRESH-INTERVAL;VALUE=DURATION:PT12H", "X-PUBLISHED-TTL:PT12H",
     ]
     for g in sorted(games, key=lambda x: (x["d"], x.get("t") or "")):
-        lines += event_lines(g, teams.get(g["team"], "Glen"), stamp)
+        lines += event_lines(g, teams.get(g["team"], "An Gleann"), stamp)
     lines.append("END:VCALENDAR")
     return "\r\n".join(fold(l) for l in lines) + "\r\n"
 
@@ -86,10 +86,10 @@ def main():
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     out = DOCS / "cal"
     out.mkdir(exist_ok=True)
-    (out / "all.ics").write_text(calendar("Glen · all teams", data["games"], teams, stamp), encoding="utf-8", newline="")
+    (out / "all.ics").write_text(calendar("An Gleann · all teams", data["games"], teams, stamp), encoding="utf-8", newline="")
     for tid, tname in teams.items():
         games = [g for g in data["games"] if g["team"] == tid]
-        (out / f"{tid}.ics").write_text(calendar(f"Glen · {tname}", games, teams, stamp), encoding="utf-8", newline="")
+        (out / f"{tid}.ics").write_text(calendar(f"An Gleann · {tname}", games, teams, stamp), encoding="utf-8", newline="")
     print(f"Wrote {len(teams) + 1} calendars to {out}")
 
 

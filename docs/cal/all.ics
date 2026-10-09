@@ -3,533 +3,533 @@ VERSION:2.0
 PRODID:-//Glen fixtures//EN
 CALSCALE:GREGORIAN
 METHOD:PUBLISH
-X-WR-CALNAME:Glen · all teams
+X-WR-CALNAME:An Gleann · all teams
 X-WR-TIMEZONE:Europe/London
 REFRESH-INTERVAL;VALUE=DURATION:PT12H
 X-PUBLISHED-TTL:PT12H
 BEGIN:VEVENT
 UID:2026-07-27-mf-banagher@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260727T180000Z
 DTEND:20260727T193000Z
-SUMMARY:Glen 2-15 v 1-6 Banagher (Minor Football)
+SUMMARY:An Gleann 2-15 v 1-6 Banagher (Minor Football)
 DESCRIPTION:O'Neills U18A1/A2 Football Championship · Group 1 · Round 1\n
  Check for time or venue changes before you travel.
 LOCATION:Watty Graham Park\, Maghera
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-07-28-u14a-slaughtneil@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260728T180000Z
 DTEND:20260728T193000Z
-SUMMARY:Glen 6-13 v 2-7 Slaughtneil (U14 Football A)
+SUMMARY:An Gleann 6-13 v 2-7 Slaughtneil (U14 Football A)
 DESCRIPTION:HSF Group U14A1 Football Championship · Group 2 · Round 1\nCh
  eck for time or venue changes before you travel.
 LOCATION:Watty Graham Park\, Maghera
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-07-28-u14c-glack@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260728T180000Z
 DTEND:20260728T193000Z
-SUMMARY:Glen 6-8 v 4-7 Glack (U14 Football C)
+SUMMARY:An Gleann 6-8 v 4-7 Glack (U14 Football C)
 DESCRIPTION:HSF Group U14C Football Championship · Group 3 · Round 1\nChe
  ck for time or venue changes before you travel.
 LOCATION:Watty Graham Park\, Maghera
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-07-30-u16f-slaughtneil@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260730T180000Z
 DTEND:20260730T193000Z
-SUMMARY:Glen 3-6 v 3-12 Slaughtneil (U16 Football)
+SUMMARY:An Gleann 3-6 v 3-12 Slaughtneil (U16 Football)
 DESCRIPTION:U16 Football League · Division 1 · Round 10\nCheck for time o
  r venue changes before you travel.
 LOCATION:Watty Graham Park\, Maghera
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-07-31-u14l2-slaughtneil@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260731T183000Z
 DTEND:20260731T200000Z
-SUMMARY:Glen 7-5 v 9-3 Slaughtneil (U14 Ladies 2)
+SUMMARY:An Gleann 7-5 v 9-3 Slaughtneil (U14 Ladies 2)
 DESCRIPTION:U14 Championship · Cup Division 5 · Quarter-final\nCheck for 
  time or venue changes before you travel.
 LOCATION:Watty Graham Park\, Maghera
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-08-02-rf-faughanvale@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260802T120000Z
 DTEND:20260802T133000Z
-SUMMARY:Glen 0-13 v 1-14 Faughanvale (Reserve Football)
+SUMMARY:An Gleann 0-13 v 1-14 Faughanvale (Reserve Football)
 DESCRIPTION:Division 1 Reserve Football League · Round 14\nCheck for time 
  or venue changes before you travel.
 LOCATION:Faughanvale
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-08-02-sf-faughanvale@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260802T133000Z
 DTEND:20260802T150000Z
-SUMMARY:Glen 2-19 v 1-14 Faughanvale (Senior Football)
+SUMMARY:An Gleann 2-19 v 1-14 Faughanvale (Senior Football)
 DESCRIPTION:Division 1 Football League · Round 14\nCheck for time or venue
   changes before you travel.
 LOCATION:Faughanvale
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-08-03-mf-ballinderry@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260803T180000Z
 DTEND:20260803T193000Z
-SUMMARY:Glen 0-14 v 4-17 Ballinderry (Minor Football)
+SUMMARY:An Gleann 0-14 v 4-17 Ballinderry (Minor Football)
 DESCRIPTION:O'Neills U18A1/A2 Football Championship · Group 1 · Round 2\n
  Check for time or venue changes before you travel.
 LOCATION:Watty Graham Park\, Maghera
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-08-03-mlf-greenlough@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260803T183000Z
 DTEND:20260803T200000Z
-SUMMARY:Glen 1-15 v 3-4 Greenlough (Minor Ladies)
+SUMMARY:An Gleann 1-15 v 3-4 Greenlough (Minor Ladies)
 DESCRIPTION:Minor Championship · Cup Division 2 · Quarter-final\nCheck fo
  r time or venue changes before you travel.
 LOCATION:Watty Graham Park\, Maghera
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-08-04-u14a-castledawson@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260804T180000Z
 DTEND:20260804T193000Z
-SUMMARY:Glen 4-6 v 0-7 Castledawson (U14 Football A)
+SUMMARY:An Gleann 4-6 v 0-7 Castledawson (U14 Football A)
 DESCRIPTION:HSF Group U14A1 Football Championship · Group 2 · Round 2\nCh
  eck for time or venue changes before you travel.
 LOCATION:Watty Graham Park\, Maghera
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-08-05-u14b-dungiven@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260805T180000Z
 DTEND:20260805T193000Z
-SUMMARY:Glen 5-9 v 2-5 Dungiven (U14 Football B)
+SUMMARY:An Gleann 5-9 v 2-5 Dungiven (U14 Football B)
 DESCRIPTION:HSF Group U14A1B Football Championship · Round 2\nCheck for ti
  me or venue changes before you travel.
 LOCATION:Watty Graham Park\, Maghera
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-08-05-cam-loup@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260805T180000Z
 DTEND:20260805T193000Z
-SUMMARY:Glen 3-10 v 0-6 Loup (Junior Camogie)
+SUMMARY:An Gleann 3-10 v 0-6 Loup (Junior Camogie)
 DESCRIPTION:Seconds/Junior Camogie League · Round 9\nCheck for time or ven
  ue changes before you travel.
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-08-06-u16f-lissan@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260806T180000Z
 DTEND:20260806T193000Z
-SUMMARY:Glen 5-15 v 6-14 Lissan (U16 Football)
+SUMMARY:An Gleann 5-15 v 6-14 Lissan (U16 Football)
 DESCRIPTION:U16 Football League · Division 1 · Round 11\nCheck for time o
  r venue changes before you travel.
 LOCATION:Lissan
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-08-07-rec-faughanvale@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260807T180000Z
 DTEND:20260807T193000Z
-SUMMARY:Glen 3-2 v 1-14 Faughanvale (Recreational Reserves)
+SUMMARY:An Gleann 3-2 v 1-14 Faughanvale (Recreational Reserves)
 DESCRIPTION:Recreational Reserve League · Division 1 · Round 11\nCheck fo
  r time or venue changes before you travel.
 LOCATION:Watty Graham Park\, Maghera
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-08-08-mlf-eoghan-rua@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260808T103000Z
 DTEND:20260808T120000Z
-SUMMARY:Glen 2-4 v 2-14 Eoghan Rua (Minor Ladies)
+SUMMARY:An Gleann 2-4 v 2-14 Eoghan Rua (Minor Ladies)
 DESCRIPTION:Minor Championship · Cup Division 2 · Semi-final\nCheck for t
  ime or venue changes before you travel.
 LOCATION:Coleraine
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-08-09-sf-swatragh@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260809T133000Z
 DTEND:20260809T150000Z
-SUMMARY:Glen 3-17 v 2-15 Swatragh (Senior Football)
+SUMMARY:An Gleann 3-17 v 2-15 Swatragh (Senior Football)
 DESCRIPTION:Division 1 Football League · Round 15\nCheck for time or venue
   changes before you travel.
 LOCATION:Watty Graham Park\, Maghera
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-08-10-mf-desertmartin@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260810T180000Z
 DTEND:20260810T193000Z
-SUMMARY:Glen 5-15 v 1-13 Desertmartin (Minor Football)
+SUMMARY:An Gleann 5-15 v 1-13 Desertmartin (Minor Football)
 DESCRIPTION:O'Neills U18A1/A2 Football Championship · Group 1 · Round 3\n
  Check for time or venue changes before you travel.
 LOCATION:Desertmartin
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-08-11-u14b-steelstown@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260811T173000Z
 DTEND:20260811T190000Z
-SUMMARY:Glen 4-17 v 2-2 Steelstown (U14 Football B)
+SUMMARY:An Gleann 4-17 v 2-2 Steelstown (U14 Football B)
 DESCRIPTION:HSF Group U14A1B Football Championship · Round 3\nCheck for ti
  me or venue changes before you travel.
 LOCATION:Steelstown
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-08-11-u14c-doire-colmcille@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260811T180000Z
 DTEND:20260811T193000Z
-SUMMARY:Glen 7-17 v 1-2 Doire Colmcille (U14 Football C)
+SUMMARY:An Gleann 7-17 v 1-2 Doire Colmcille (U14 Football C)
 DESCRIPTION:HSF Group U14C Football Championship · Group 3 · Round 3\nChe
  ck for time or venue changes before you travel.
 LOCATION:Doire Colmcille
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-08-11-u14a-steelstown@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260811T183000Z
 DTEND:20260811T200000Z
-SUMMARY:Glen 5-16 v 1-4 Steelstown (U14 Football A)
+SUMMARY:An Gleann 5-16 v 1-4 Steelstown (U14 Football A)
 DESCRIPTION:HSF Group U14A1 Football Championship · Group 2 · Round 3\nCh
  eck for time or venue changes before you travel.
 LOCATION:Steelstown
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-08-12-int-ballinascreen@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260812T183000Z
 DTEND:20260812T200000Z
-SUMMARY:Glen 4-12 v 1-7 Ballinascreen (Intermediate Ladies)
+SUMMARY:An Gleann 4-12 v 1-7 Ballinascreen (Intermediate Ladies)
 DESCRIPTION:Intermediate Championship · League Division 1 · Round 1\nChec
  k for time or venue changes before you travel.
 LOCATION:Watty Graham Park\, Maghera
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-08-13-u14l2-dungiven@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260813T183000Z
 DTEND:20260813T200000Z
-SUMMARY:Glen 6-12 v 5-1 Dungiven (U14 Ladies 2)
+SUMMARY:An Gleann 6-12 v 5-1 Dungiven (U14 Ladies 2)
 DESCRIPTION:U14 Championship · Cup Division 5 · Preliminary\nCheck for ti
  me or venue changes before you travel.
 LOCATION:Watty Graham Park\, Maghera
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-08-14-rec-slaughtneil@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260814T183000Z
 DTEND:20260814T200000Z
-SUMMARY:Glen 1-13 v 0-11 Slaughtneil (Recreational Reserves)
+SUMMARY:An Gleann 1-13 v 0-11 Slaughtneil (Recreational Reserves)
 DESCRIPTION:Recreational Reserve League · Division 1 · Round 12\nCheck fo
  r time or venue changes before you travel.
 LOCATION:Watty Graham Park\, Maghera
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-08-17-rf-steelstown@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART;VALUE=DATE:20260817
 DTEND;VALUE=DATE:20260818
-SUMMARY:Glen v Steelstown (Reserve Football) – walkover
+SUMMARY:An Gleann v Steelstown (Reserve Football) – walkover
 DESCRIPTION:Division 1 Reserve Football League · Round 4\nCheck for time o
  r venue changes before you travel.
 LOCATION:Steelstown
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-08-17-mf-magherafelt@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260817T191500Z
 DTEND:20260817T204500Z
-SUMMARY:Glen 0-12 v 7-14 Magherafelt (Minor Football)
+SUMMARY:An Gleann 0-12 v 7-14 Magherafelt (Minor Football)
 DESCRIPTION:O'Neills U18A1 Football Championship · Quarter-final\nCheck fo
  r time or venue changes before you travel.
 LOCATION:Magherafelt
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-08-18-u14a-dungiven@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260818T180000Z
 DTEND:20260818T193000Z
-SUMMARY:Glen 5-14 v 3-3 Dungiven (U14 Football A)
+SUMMARY:An Gleann 5-14 v 3-3 Dungiven (U14 Football A)
 DESCRIPTION:HSF Group U14A1 Football Championship · Quarter-final\nCheck f
  or time or venue changes before you travel.
 LOCATION:Watty Graham Park\, Maghera
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-08-18-u14c-sean-dolans@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260818T180000Z
 DTEND:20260818T193000Z
-SUMMARY:Glen 2-8 v 4-6 Sean Dolans (U14 Football C)
+SUMMARY:An Gleann 2-8 v 4-6 Sean Dolans (U14 Football C)
 DESCRIPTION:HSF Group U14C Football Championship · Quarter-final\nCheck fo
  r time or venue changes before you travel.
 LOCATION:Watty Graham Park\, Maghera
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-08-19-u14b-steelstown@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260819T180000Z
 DTEND:20260819T193000Z
-SUMMARY:Glen 0-8 v 8-5 Steelstown (U14 Football B)
+SUMMARY:An Gleann 0-8 v 8-5 Steelstown (U14 Football B)
 DESCRIPTION:HSF Group U14A1B Football Championship · Cup · Quarter-final\
  nCheck for time or venue changes before you travel.
 LOCATION:Watty Graham Park\, Maghera
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-08-22-u14l2-magherafelt@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260822T160000Z
 DTEND:20260822T173000Z
-SUMMARY:Glen 8-13 v 7-5 Magherafelt (U14 Ladies 2)
+SUMMARY:An Gleann 8-13 v 7-5 Magherafelt (U14 Ladies 2)
 DESCRIPTION:U14 Championship · Cup Division 5 · Final\nCheck for time or 
  venue changes before you travel.
 LOCATION:Magherafelt
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-08-22-u14l-magherafelt@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260822T180000Z
 DTEND:20260822T193000Z
-SUMMARY:Glen 4-11 v 11-7 Magherafelt (U14 Ladies)
+SUMMARY:An Gleann 4-11 v 11-7 Magherafelt (U14 Ladies)
 DESCRIPTION:U14 Championship · Cup Division 2 · Final\nCheck for time or 
  venue changes before you travel.
 LOCATION:Magherafelt
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-08-24-int-ballerin@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260824T183000Z
 DTEND:20260824T200000Z
-SUMMARY:Glen 2-11 v 3-3 Ballerin (Intermediate Ladies)
+SUMMARY:An Gleann 2-11 v 3-3 Ballerin (Intermediate Ladies)
 DESCRIPTION:Intermediate Championship · League Division 1 · Round 2\nChec
  k for time or venue changes before you travel.
 LOCATION:Ballerin
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-08-27-u16f-swatragh@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260827T180000Z
 DTEND:20260827T193000Z
-SUMMARY:Glen 7-14 v 3-17 Swatragh (U16 Football)
+SUMMARY:An Gleann 7-14 v 3-17 Swatragh (U16 Football)
 DESCRIPTION:B A Mullan Farms U16A1/A2 Football Championship · Group 2 · R
  ound 1\nCheck for time or venue changes before you travel.
 LOCATION:Watty Graham Park\, Maghera
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-08-28-rec-banagher@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART;VALUE=DATE:20260828
 DTEND;VALUE=DATE:20260829
-SUMMARY:Glen v Banagher (Recreational Reserves) – walkover
+SUMMARY:An Gleann v Banagher (Recreational Reserves) – walkover
 DESCRIPTION:Recreational Reserve League · Division 1 · Round 13\nCheck fo
  r time or venue changes before you travel.
 LOCATION:Watty Graham Park\, Maghera
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-08-30-sf-banagher@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260830T124500Z
 DTEND:20260830T141500Z
-SUMMARY:Glen 2-20 v 4-7 Banagher (Senior Football)
+SUMMARY:An Gleann 2-20 v 4-7 Banagher (Senior Football)
 DESCRIPTION:O'Neills Senior Football Championship · Round 1\nCheck for tim
  e or venue changes before you travel.
 LOCATION:Owenbeg Derry GAA Centre of Excellence
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-09-01-u14a-magherafelt@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260901T180000Z
 DTEND:20260901T193000Z
-SUMMARY:Glen 0-11 v 1-7 Magherafelt (U14 Football A)
+SUMMARY:An Gleann 0-11 v 1-7 Magherafelt (U14 Football A)
 DESCRIPTION:HSF Group U14A1 Football Championship · Semi-final\nCheck for 
  time or venue changes before you travel.
 LOCATION:Magherafelt
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-09-03-u16f-ballinascreen@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260903T180000Z
 DTEND:20260903T193000Z
-SUMMARY:Glen 0-10 v 7-11 Ballinascreen (U16 Football)
+SUMMARY:An Gleann 0-10 v 7-11 Ballinascreen (U16 Football)
 DESCRIPTION:B A Mullan Farms U16A1/A2 Football Championship · Group 2 · R
  ound 2\nCheck for time or venue changes before you travel.
 LOCATION:Ballinascreen
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-09-03-int-lavey@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260903T183000Z
 DTEND:20260903T200000Z
-SUMMARY:Glen 2-11 v 0-10 Lavey (Intermediate Ladies)
+SUMMARY:An Gleann 2-11 v 0-10 Lavey (Intermediate Ladies)
 DESCRIPTION:Intermediate Championship · League Division 1 · Round 3\nChec
  k for time or venue changes before you travel.
 LOCATION:Watty Graham Park\, Maghera
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-09-04-rec-newbridge@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260904T183000Z
 DTEND:20260904T200000Z
-SUMMARY:Glen 2-10 v 1-15 Newbridge (Recreational Reserves)
+SUMMARY:An Gleann 2-10 v 1-15 Newbridge (Recreational Reserves)
 DESCRIPTION:JPM Recreational Reserve Cup · Round 1\nCheck for time or venu
  e changes before you travel.
 LOCATION:Watty Graham Park\, Maghera
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-09-06-sf-bellaghy@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260906T170000Z
 DTEND:20260906T183000Z
-SUMMARY:Glen 3-20 v 0-11 Bellaghy (Senior Football)
+SUMMARY:An Gleann 3-20 v 0-11 Bellaghy (Senior Football)
 DESCRIPTION:O'Neills Senior Football Championship · Q1a\nCheck for time or
   venue changes before you travel.
 LOCATION:Owenbeg Derry GAA Centre of Excellence
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-09-07-rf-newbridge@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260907T183000Z
 DTEND:20260907T200000Z
-SUMMARY:Glen 2-22 v 2-13 Newbridge (Reserve Football)
+SUMMARY:An Gleann 2-22 v 2-13 Newbridge (Reserve Football)
 DESCRIPTION:Oakleaf Senior Reserve Football Championship · Round 1\nCheck 
  for time or venue changes before you travel.
 LOCATION:Watty Graham Park\, Maghera
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-09-09-int-claudy@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260909T183000Z
 DTEND:20260909T200000Z
-SUMMARY:Glen 2-8 v 1-6 Claudy (Intermediate Ladies)
+SUMMARY:An Gleann 2-8 v 1-6 Claudy (Intermediate Ladies)
 DESCRIPTION:Intermediate Championship · League Division 1 · Round 4\nChec
  k for time or venue changes before you travel.
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-09-10-u16f-castledawson@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260910T180000Z
 DTEND:20260910T193000Z
-SUMMARY:Glen 4-12 v 4-15 Castledawson (U16 Football)
+SUMMARY:An Gleann 4-12 v 4-15 Castledawson (U16 Football)
 DESCRIPTION:B A Mullan Farms U16A1/A2 Football Championship · Group 2 · R
  ound 3\nCheck for time or venue changes before you travel.
 LOCATION:Castledawson
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-09-15-u14a-ballinascreen@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260915T180000Z
 DTEND:20260915T193000Z
-SUMMARY:Glen 0-9 v 4-7 Ballinascreen (U14 Football A)
+SUMMARY:An Gleann 0-9 v 4-7 Ballinascreen (U14 Football A)
 DESCRIPTION:HSF Group U14A1 Football Championship · Final\nCheck for time 
  or venue changes before you travel.
 LOCATION:Bellaghy
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-09-20-u16l-kilrea@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260920T100000Z
 DTEND:20260920T113000Z
-SUMMARY:Glen 3-8 v 3-14 Kilrea (U16 Ladies)
+SUMMARY:An Gleann 3-8 v 3-14 Kilrea (U16 Ladies)
 DESCRIPTION:U16 Championship · Cup Division 2 · Quarter-final\nCheck for 
  time or venue changes before you travel.
 LOCATION:Watty Graham Park\, Maghera
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-09-24-u16f-greenlough@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260924T180000Z
 DTEND:20260924T193000Z
-SUMMARY:Glen 6-6 v 3-6 Greenlough (U16 Football)
+SUMMARY:An Gleann 6-6 v 3-6 Greenlough (U16 Football)
 DESCRIPTION:B A Mullan Farms U16A2 Football Championship · Quarter-final\n
  Check for time or venue changes before you travel.
 LOCATION:Watty Graham Park\, Maghera
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-09-26-int-lavey@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260926T130000Z
 DTEND:20260926T143000Z
-SUMMARY:Glen 2-8 v 0-10 Lavey (Intermediate Ladies)
+SUMMARY:An Gleann 2-8 v 0-10 Lavey (Intermediate Ladies)
 DESCRIPTION:Intermediate Championship · Final\nCheck for time or venue cha
  nges before you travel.
 LOCATION:Slaughtneil
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-09-27-u16l-sean-dolans@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260927T100000Z
 DTEND:20260927T113000Z
-SUMMARY:Glen 4-9 v 2-5 Sean Dolans (U16 Ladies)
+SUMMARY:An Gleann 4-9 v 2-5 Sean Dolans (U16 Ladies)
 DESCRIPTION:U16 Championship · Shield Division 2 · Semi-final\nCheck for 
  time or venue changes before you travel.
 LOCATION:Sean Dolans
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-09-28-rf-ballinderry@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260928T183000Z
 DTEND:20260928T200000Z
-SUMMARY:Glen 1-14 v 0-13 Ballinderry (Reserve Football)
+SUMMARY:An Gleann 1-14 v 0-13 Ballinderry (Reserve Football)
 DESCRIPTION:Oakleaf Senior Reserve Football Championship · Quarter-final\n
  Check for time or venue changes before you travel.
 LOCATION:Watty Graham Park\, Maghera
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-10-03-sf-kilrea@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20261003T150000Z
 DTEND:20261003T163000Z
-SUMMARY:Glen 1-16 v 1-6 Kilrea (Senior Football)
+SUMMARY:An Gleann 1-16 v 1-6 Kilrea (Senior Football)
 DESCRIPTION:O'Neills Senior Football Championship · Quarter-final\nCheck f
  or time or venue changes before you travel.
 LOCATION:Owenbeg Derry GAA Centre of Excellence
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-10-05-rf-bellaghy@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20261005T183000Z
 DTEND:20261005T200000Z
-SUMMARY:Glen 1-15 v 2-13 Bellaghy (Reserve Football)
+SUMMARY:An Gleann 1-15 v 2-13 Bellaghy (Reserve Football)
 DESCRIPTION:Oakleaf Senior Reserve Football Championship · Semi-final\nChe
  ck for time or venue changes before you travel.
 LOCATION:Bellaghy
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-10-08-u16f-steelstown@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20261008T180000Z
 DTEND:20261008T193000Z
-SUMMARY:Glen 5-8 v 1-15 Steelstown (U16 Football)
+SUMMARY:An Gleann 5-8 v 1-15 Steelstown (U16 Football)
 DESCRIPTION:B A Mullan Farms U16A2 Football Championship · Semi-final\nChe
  ck for time or venue changes before you travel.
 LOCATION:Watty Graham Park\, Maghera
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-10-11-int-burren@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20261011T103000Z
 DTEND:20261011T120000Z
-SUMMARY:Glen v Burren (Intermediate Ladies)
+SUMMARY:An Gleann v Burren (Intermediate Ladies)
 DESCRIPTION:Ulster LGFA Intermediate Club Championship\nCheck for time or v
  enue changes before you travel.
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-10-11-sf-newbridge@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20261011T150000Z
 DTEND:20261011T163000Z
-SUMMARY:Glen v Newbridge (Senior Football)
+SUMMARY:An Gleann v Newbridge (Senior Football)
 DESCRIPTION:O'Neills Senior Football Championship · Semi-final\nCheck for 
  time or venue changes before you travel.
 LOCATION:Owenbeg Derry GAA Centre of Excellence

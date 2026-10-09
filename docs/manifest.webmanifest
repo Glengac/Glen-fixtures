@@ -1,7 +1,7 @@
 {
-  "name": "Glen fixtures & results",
-  "short_name": "Glen GAC",
-  "description": "Fixtures, results and live scores for every Watty Graham's GAC Glen team.",
+  "name": "An Gleann fixtures & results",
+  "short_name": "An Gleann",
+  "description": "Fixtures, results and live scores for every Watty Graham's GAC An Gleann team.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

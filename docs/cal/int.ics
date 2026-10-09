@@ -3,65 +3,65 @@ VERSION:2.0
 PRODID:-//Glen fixtures//EN
 CALSCALE:GREGORIAN
 METHOD:PUBLISH
-X-WR-CALNAME:Glen · Intermediate Ladies
+X-WR-CALNAME:An Gleann · Intermediate Ladies
 X-WR-TIMEZONE:Europe/London
 REFRESH-INTERVAL;VALUE=DURATION:PT12H
 X-PUBLISHED-TTL:PT12H
 BEGIN:VEVENT
 UID:2026-08-12-int-ballinascreen@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260812T183000Z
 DTEND:20260812T200000Z
-SUMMARY:Glen 4-12 v 1-7 Ballinascreen (Intermediate Ladies)
+SUMMARY:An Gleann 4-12 v 1-7 Ballinascreen (Intermediate Ladies)
 DESCRIPTION:Intermediate Championship · League Division 1 · Round 1\nChec
  k for time or venue changes before you travel.
 LOCATION:Watty Graham Park\, Maghera
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-08-24-int-ballerin@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260824T183000Z
 DTEND:20260824T200000Z
-SUMMARY:Glen 2-11 v 3-3 Ballerin (Intermediate Ladies)
+SUMMARY:An Gleann 2-11 v 3-3 Ballerin (Intermediate Ladies)
 DESCRIPTION:Intermediate Championship · League Division 1 · Round 2\nChec
  k for time or venue changes before you travel.
 LOCATION:Ballerin
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-09-03-int-lavey@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260903T183000Z
 DTEND:20260903T200000Z
-SUMMARY:Glen 2-11 v 0-10 Lavey (Intermediate Ladies)
+SUMMARY:An Gleann 2-11 v 0-10 Lavey (Intermediate Ladies)
 DESCRIPTION:Intermediate Championship · League Division 1 · Round 3\nChec
  k for time or venue changes before you travel.
 LOCATION:Watty Graham Park\, Maghera
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-09-09-int-claudy@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260909T183000Z
 DTEND:20260909T200000Z
-SUMMARY:Glen 2-8 v 1-6 Claudy (Intermediate Ladies)
+SUMMARY:An Gleann 2-8 v 1-6 Claudy (Intermediate Ladies)
 DESCRIPTION:Intermediate Championship · League Division 1 · Round 4\nChec
  k for time or venue changes before you travel.
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-09-26-int-lavey@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20260926T130000Z
 DTEND:20260926T143000Z
-SUMMARY:Glen 2-8 v 0-10 Lavey (Intermediate Ladies)
+SUMMARY:An Gleann 2-8 v 0-10 Lavey (Intermediate Ladies)
 DESCRIPTION:Intermediate Championship · Final\nCheck for time or venue cha
  nges before you travel.
 LOCATION:Slaughtneil
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-10-11-int-burren@glen-fixtures
-DTSTAMP:20261009T085159Z
+DTSTAMP:20261009T094505Z
 DTSTART:20261011T103000Z
 DTEND:20261011T120000Z
-SUMMARY:Glen v Burren (Intermediate Ladies)
+SUMMARY:An Gleann v Burren (Intermediate Ladies)
 DESCRIPTION:Ulster LGFA Intermediate Club Championship\nCheck for time or v
  enue changes before you travel.
 END:VEVENT
