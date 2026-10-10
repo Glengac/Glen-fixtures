@@ -481,7 +481,7 @@ footer p { margin: 0; }
 /* Jerseys on the pitch */
 .slot .jer { position: relative; display: block; width: clamp(32px, 10vw, 58px); }
 .slot .jsvg { display: block; width: 100%; height: auto; filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.45)); }
-.jn { font-family: var(--display); font-weight: 800; fill: #FFFFFF; stroke: #0B4D2D; stroke-width: 3.5; paint-order: stroke; letter-spacing: -0.5px; }
+.jn { font-family: var(--display); font-weight: 800; fill: #FFFFFF; stroke: #0A2A5E; stroke-width: 3.5; paint-order: stroke; letter-spacing: -0.5px; }
 .jn.gk { fill: #111111; stroke: none; }
 .slot .inb {
   position: absolute; right: -6px; top: -4px; width: 15px; height: 15px; border-radius: 50%;
