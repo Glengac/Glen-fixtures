@@ -21,7 +21,8 @@
 
   let DATA = { updated: null, teams: [], games: [] };
   let TEAMS = {};
-  let LIVE = { lineups: {}, matches: [], extra: [], venues: {}, results: {} };
+  let LIVE = { lineups: {}, matches: [], extra: [], venues: {}, results: {}, reportKeys: {} };
+  const REPORT_CACHE = {};
   let dataState = "loading";        // loading | ready | error
   let liveState = CFG ? "loading" : "off"; // off | loading | ready | error
   let db = null, auth = null, user = null, adderApp = null;
@@ -229,7 +230,7 @@
   /* Who's on the pitch now: the team sheet with this game's subs applied in order.
      field: position 1-15 -> { name, no, sub }; spare: everyone who could come on (unused subs, then players taken off) */
   function lineupNow(m) {
-    const lu = lineupFor(m.team);
+    const lu = m.lineup ? readLineups({ t: m.lineup }).t : lineupFor(m.team);
     const field = {};
     POS.forEach(function (p) { field[p.n] = { name: lu[p.n] || "", no: p.n }; });
     const offAt = {};
@@ -287,7 +288,7 @@
     const xs = v.fixtures || {};
     const extra = Object.keys(xs).map(function (k) { return Object.assign({}, xs[k], { id: k, src: "club" }); })
       .filter(function (g) { return g.d && g.opp && g.team; });
-    return { lineups: readLineups(v.lineups), matches: matches, extra: extra, venues: v.venues || {}, results: v.results || {} };
+    return { lineups: readLineups(v.lineups), matches: matches, extra: extra, venues: v.venues || {}, results: v.results || {}, reportKeys: v.reportKeys || {} };
   }
   function readLineups(raw) {
     const out = {};
@@ -426,7 +427,13 @@
       '<p class="meta">' + (g.t ? "<time>" + esc(g.t) + '</time><span aria-hidden="true">·</span>' : "") + venueLink(g) +
       ' <span class="chip ha">' + HA[g.ha] + "</span>" +
       (g.note ? '<span aria-hidden="true">·</span><span>' + esc(g.note) + "</span>" : "") + "</p>" +
-      xtools(g) + "</div>" + score + "</article>";
+      rtools(g, o) + xtools(g) + "</div>" + score + "</article>";
+  }
+  function rtools(g, o) {
+    const key = gameReportKey(g);
+    if (LIVE.reportKeys && LIVE.reportKeys[key]) return '<p class="rtools"><button type="button" class="linkbtn" data-act="report" data-key="' + esc(key) + '">Match centre</button></p>';
+    if (o === "w" || o === "l" || o === "d") return '<p class="rtools"><button type="button" class="linkbtn" data-act="ggraphic" data-key="' + esc(key) + '">Result graphic</button></p>';
+    return "";
   }
   function xtools(g) {
     if (g.src !== "club" || !canScore()) return "";
@@ -601,7 +608,7 @@
   }
 
   /* Two-sided list: An Gleann's scores and subs on the left, the opposition's on the right, minute and running score down the middle */
-  function feedHtml(m) {
+  function feedHtml(m, readonly) {
     const subs = m.subs || [];
     if (!m.events.length && !subs.length) return '<div class="list"><div class="empty">No scores yet. An Gleann\'s scores show on the left and ' + esc(m.opp) + "'s on the right, with the scorer and the umpire's flag.</div></div>";
     const items = m.events.map(function (e) { return { k: "score", e: e, at: e.at }; })
@@ -615,7 +622,7 @@
       it.run = gp(g) + "<i>–</i>" + gp(o);
     });
     items.reverse();
-    const scorer = canScore(), mid = ' data-mid="' + esc(m.id) + '"';
+    const scorer = canScore() && !readonly, mid = ' data-mid="' + esc(m.id) + '"';
     let html = '<div class="fr fhead"><span class="fs glen">An Gleann</span><span class="fm">Min</span><span class="fs opp">' + esc(m.opp) + "</span></div>";
     let lastHalf = null;
     items.forEach(function (it) {
@@ -715,7 +722,7 @@
     const vhref = m.mapUrl ? safeUrl(m.mapUrl) : (m.venue ? venueHref({ name: m.venue, typed: !VENUE_QUERY[m.venue] }) : null);
     return '<section class="panel board" aria-label="Live score">' +
       '<div class="kicker">' + (isActive(m) ? '<span class="dot" aria-hidden="true"></span><span>Live</span>' : "") +
-      '<span class="status">' + esc(phaseLabel(m)) + "</span></div>" +
+      (phase(m) === "ft" ? "" : '<span class="status">' + esc(phaseLabel(m)) + "</span>") + "</div>" +
       '<p class="clock" data-clock="' + esc(m.id) + '" aria-label="Match clock">' + esc(clockText(m)) + "</p>" +
       '<p class="team">' + esc(teamName(m.team)) + " · " + esc(m.comp) + "</p>" +
       '<div class="sides">' +
@@ -744,10 +751,232 @@
     const another = !canScore() ? "" : state.showSetup ? setupHtml(true)
       : '<div class="btnrow"><button type="button" class="linkbtn" data-act="showsetup">Start another live game</button></div>';
     return matchTabs(list, m) + boardHtml(m) +
+      (phase(m) === "ft" ? '<div class="btnrow ftshare"><button type="button" class="pbtn" data-act="graphic" data-mid="' + esc(m.id) + '">Result graphic</button></div>' : "") +
       (canScore() ? scorerHtml(m) : "") +
       '<section class="section"><h2>Scores <small>' + counts + "</small></h2>" + feedHtml(m) + legendHtml() + "</section>" +
       '<section class="section"><h2>Team <small>' + (named ? named + " of 15 named" : "Team sheet to come") + "</small></h2>" + pitchHtml(m) + "</section>" +
       another;
+  }
+
+  /* ---------- match centre and result graphic ---------- */
+  /* A finished live game is saved as a report at /live/reports/<key> (timeline, subs, team sheet), with /live/reportKeys/<key>
+     so the Results tab knows which games have one. key: the official game's vkey, or "club-" + the club game's id. */
+  function reportKeyFor(m, t) {
+    t = t || resultTarget(m);
+    return t.kind === "official" ? t.key : t.kind === "club" ? "club-" + t.id : null;
+  }
+  function gameReportKey(g) { return g.src === "club" ? "club-" + g.id : vkey(g); }
+  function listToMap(list) {
+    const o = {};
+    (list || []).forEach(function (x) {
+      const c = {};
+      Object.keys(x).forEach(function (k) { if (k !== "id" && x[k] !== undefined) c[k] = x[k]; });
+      o[x.id] = c;
+    });
+    return o;
+  }
+  function lineupToStore(lu) {
+    const o = {};
+    Object.keys(lu || {}).forEach(function (k) { if (lu[k]) o["n" + k] = lu[k]; });
+    return o;
+  }
+  function reportOf(m, events, subs) {
+    const clock = {};
+    ["h1", "ht", "h2", "ft"].forEach(function (k) { if (m.clock[k]) clock[k] = m.clock[k]; });
+    if (!clock.ft) clock.ft = firebase.database.ServerValue.TIMESTAMP;
+    const r = {
+      team: m.team, opp: m.opp, comp: m.comp || "", venue: m.venue || "", d: m.d || londonToday(), half: m.half || 30, ha: m.ha || "N",
+      us: gp(tally(events, "glen")), them: gp(tally(events, "opp")), clock: clock,
+      events: listToMap(events), subs: listToMap(subs || m.subs || []),
+      lineup: m.lineup || lineupToStore(lineupFor(m.team)), at: firebase.database.ServerValue.TIMESTAMP
+    };
+    if (m.t) r.t = m.t;
+    if (m.mapUrl) r.mapUrl = m.mapUrl;
+    return r;
+  }
+  function putReport(upd, key, m, events, subs) {
+    if (!key) return upd;
+    upd["reports/" + key] = reportOf(m, events, subs);
+    upd["reportKeys/" + key] = true;
+    return upd;
+  }
+  function readReport(raw, key) {
+    const r = readMatch(raw, key, "reports/" + key);
+    r.lineup = raw.lineup || {};
+    return r;
+  }
+  function loadReport(key) {
+    return liveRef("reports/" + key).once("value").then(function (s) { return s.val() ? readReport(s.val(), key) : null; });
+  }
+  /* scorers for one side, most scored first; unnamed scores grouped at the end */
+  function scorerList(events, side) {
+    const by = {}, order = [];
+    events.forEach(function (e) {
+      if (e.side !== side || !KINDS[e.type]) return;
+      const k = e.player || "";
+      if (!by[k]) { by[k] = { name: k, g: 0, p: 0 }; order.push(k); }
+      if (e.type === "goal") by[k].g++; else by[k].p += e.type === "two" ? 2 : 1;
+    });
+    return order.map(function (k) { const s = by[k]; s.t = s.g * 3 + s.p; return s; })
+      .sort(function (a, b) { return (a.name ? 0 : 1) - (b.name ? 0 : 1) || b.t - a.t || b.g - a.g; });
+  }
+  function scorerText(s) { return (s.name || "Not named") + " " + s.g + "-" + s.p; }
+  function scorersHtml(r) {
+    const block = function (label, list) {
+      return '<div class="mc-sc"><h4>' + esc(label) + "</h4>" + (list.length
+        ? "<ul>" + list.map(function (s) { return "<li><span>" + esc(s.name || "Not named") + "</span><b>" + s.g + "-" + s.p + "</b></li>"; }).join("") + "</ul>"
+        : '<p class="hint">' + (label === "An Gleann" ? "No scores" : "No scorers named") + "</p>") + "</div>";
+    };
+    return '<div class="mc-scorers">' + block("An Gleann", scorerList(r.events, "glen")) + block(r.opp, scorerList(r.events, "opp")) + "</div>";
+  }
+  function openReport(key) {
+    sheetKind = "report:" + key;
+    openSheet('<h2 id="sheet-title">Match centre</h2><p class="hint">Loading…</p><div class="btnrow"><button type="button" class="linkbtn" data-act="close">Close</button></div>', "report:" + key);
+    loadReport(key).then(function (r) {
+      if (sheetKind !== "report:" + key) return;
+      if (!r) { openSheet('<h2 id="sheet-title">Match centre</h2><p class="hint">This game\'s details aren\'t available.</p><div class="btnrow"><button type="button" class="linkbtn" data-act="close">Close</button></div>', "report:" + key); return; }
+      REPORT_CACHE[key] = r;
+      const nsubs = r.subs.length;
+      openSheet('<h2 id="sheet-title">An Gleann v ' + esc(r.opp) + "</h2>" +
+        '<p class="hint">' + esc(fmtDate(r.d, { weekday: "long", day: "numeric", month: "long", year: "numeric" })) + "</p>" +
+        boardHtml(r) +
+        '<div class="btnrow"><button type="button" class="pbtn" data-act="graphic" data-key="' + esc(key) + '">Result graphic</button>' +
+        '<button type="button" class="linkbtn" data-act="close">Close</button></div>' +
+        "<h3>Scorers</h3>" + scorersHtml(r) +
+        "<h3>Timeline <small>" + r.events.length + (r.events.length === 1 ? " score" : " scores") + (nsubs ? " · " + nsubs + (nsubs === 1 ? " sub" : " subs") : "") + "</small></h3>" +
+        feedHtml(r, true) + legendHtml() +
+        "<h3>Team</h3>" + pitchHtml(r), "report:" + key);
+    }).catch(function () {
+      if (sheetKind === "report:" + key) openSheet('<h2 id="sheet-title">Match centre</h2><p class="hint">Couldn\'t load this game. Check your signal and try again.</p><div class="btnrow"><button type="button" class="linkbtn" data-act="close">Close</button></div>', "report:" + key);
+    });
+  }
+
+  /* Square result picture for WhatsApp, Facebook and Instagram, drawn on a canvas */
+  const SHARE_LINK = "tinyurl.com/WG-LiveUpdates";
+  let graphicFile = null, graphicUrl = null;
+  function graphicInfo(src, isGame) {
+    const events = isGame ? null : src.events;
+    return {
+      team: teamName(src.team), opp: src.opp, comp: isGame ? compLine(src) : (src.comp || ""), d: src.d,
+      venue: isGame ? (venueOf(src).name || "") : (src.venue || ""),
+      us: events ? gp(tally(events, "glen")) : src.us, them: events ? gp(tally(events, "opp")) : src.them,
+      scorers: events ? scorerList(events, "glen").filter(function (s) { return s.name; }).map(scorerText) : []
+    };
+  }
+  function loadImage(src) {
+    return new Promise(function (resolve, reject) { const i = new Image(); i.onload = function () { resolve(i); }; i.onerror = reject; i.src = src; });
+  }
+  function fitFont(ctx, text, weight, family, max, maxWidth) {
+    let size = max;
+    do { ctx.font = weight + " " + size + 'px "' + family + '"'; size -= 2; } while (ctx.measureText(text).width > maxWidth && size > 20);
+  }
+  function wrapLines(ctx, text, maxWidth, maxLines) {
+    const words = text.split(" "), lines = [];
+    let line = "";
+    words.forEach(function (w) {
+      const t = line ? line + " " + w : w;
+      if (ctx.measureText(t).width > maxWidth && line) { lines.push(line); line = w; } else line = t;
+    });
+    if (line) lines.push(line);
+    if (lines.length > maxLines) { lines.length = maxLines; lines[maxLines - 1] = lines[maxLines - 1].replace(/\s*\S*$/, "") + " …"; }
+    return lines;
+  }
+  function drawGraphic(info) {
+    const D = "Big Shoulders Display", B = "Source Sans 3";
+    const fonts = document.fonts ? Promise.all([
+      document.fonts.load('800 100px "' + D + '"'), document.fonts.load('600 30px "' + B + '"'), document.fonts.load('700 30px "' + B + '"')
+    ]).catch(function () {}) : Promise.resolve();
+    return Promise.all([fonts, loadImage("crest.jpg").catch(function () { return null; })]).then(function (res) {
+      const crest = res[1];
+      const S = 1080, c = document.createElement("canvas");
+      c.width = S; c.height = S;
+      const ctx = c.getContext("2d");
+      const GREEN = "#0B4D2D", GOLD = "#F3C431", PALE = "#B9D3C3", WHITE = "#FFFFFF";
+      ctx.fillStyle = GREEN; ctx.fillRect(0, 0, S, S);
+      /* faint pitch stripes */
+      ctx.fillStyle = "rgba(255,255,255,0.035)";
+      for (let y = 0; y < S; y += 120) ctx.fillRect(0, y, S, 60);
+      /* gold band along the bottom, like the jersey */
+      ctx.fillStyle = GOLD; ctx.fillRect(0, S - 34, S, 34);
+      ctx.fillStyle = GREEN; ctx.fillRect(0, S - 24, S, 4); ctx.fillRect(0, S - 14, S, 4);
+      /* header */
+      const pad = 72;
+      if (crest) {
+        ctx.save();
+        const cs = 150, r = 26;
+        ctx.beginPath();
+        ctx.moveTo(pad + r, pad); ctx.arcTo(pad + cs, pad, pad + cs, pad + cs, r); ctx.arcTo(pad + cs, pad + cs, pad, pad + cs, r);
+        ctx.arcTo(pad, pad + cs, pad, pad, r); ctx.arcTo(pad, pad, pad + cs, pad, r); ctx.closePath(); ctx.clip();
+        ctx.drawImage(crest, pad, pad, cs, cs);
+        ctx.restore();
+      }
+      const hx = crest ? pad + 150 + 36 : pad, hw = S - hx - pad;
+      ctx.textBaseline = "alphabetic"; ctx.textAlign = "left";
+      ctx.fillStyle = PALE; ctx.font = '700 28px "' + B + '"';
+      ctx.fillText("WATTY GRAHAM'S GAC AN GLEANN", hx, pad + 34);
+      ctx.fillStyle = GOLD; fitFont(ctx, info.team.toUpperCase(), "800", D, 78, hw);
+      ctx.fillText(info.team.toUpperCase(), hx, pad + 108);
+      ctx.fillStyle = "#E3EEE7"; ctx.font = '600 32px "' + B + '"';
+      wrapLines(ctx, info.comp, hw, 2).forEach(function (l, i) { ctx.fillText(l, hx, pad + 152 + i * 38); });
+      /* full time (a little lower when there are no scorers to list) */
+      const dy = info.scorers.length ? 0 : 60;
+      ctx.textAlign = "center";
+      ctx.font = '800 42px "' + D + '"';
+      const ft = "FULL TIME", fw = ctx.measureText(ft).width + 56;
+      ctx.fillStyle = GOLD;
+      const py = 330 + dy;
+      ctx.beginPath(); ctx.roundRect ? ctx.roundRect(S / 2 - fw / 2, py, fw, 60, 30) : ctx.rect(S / 2 - fw / 2, py, fw, 60); ctx.fill();
+      ctx.fillStyle = GREEN; ctx.fillText(ft, S / 2, py + 45);
+      /* score */
+      const cols = [S * 0.27, S * 0.73], colW = 430;
+      [["AN GLEANN", info.us, GOLD], [String(info.opp || "").toUpperCase(), info.them, WHITE]].forEach(function (side, i) {
+        ctx.fillStyle = WHITE; fitFont(ctx, side[0], "800", D, 64, colW);
+        ctx.fillText(side[0], cols[i], 478 + dy);
+        ctx.fillStyle = side[2]; ctx.font = '800 200px "' + D + '"';
+        ctx.fillText(side[1] || "", cols[i], 676 + dy);
+        const pts = points(side[1]);
+        ctx.fillStyle = PALE; ctx.font = '600 38px "' + B + '"';
+        if (pts != null) ctx.fillText("(" + pts + " pts)", cols[i], 730 + dy);
+      });
+      ctx.fillStyle = PALE; ctx.font = '800 54px "' + D + '"'; ctx.fillText("v", S / 2, 600 + dy);
+      /* scorers */
+      ctx.textAlign = "left";
+      let y = 812;
+      if (info.scorers.length) {
+        ctx.fillStyle = PALE; ctx.font = '700 26px "' + B + '"';
+        ctx.fillText("AN GLEANN SCORERS", pad, y); y += 46;
+        ctx.fillStyle = WHITE; ctx.font = '600 34px "' + B + '"';
+        wrapLines(ctx, info.scorers.join(" · "), S - pad * 2, 3).forEach(function (l) { ctx.fillText(l, pad, y); y += 44; });
+      }
+      /* footer */
+      const foot = fmtDate(info.d, { weekday: "short", day: "numeric", month: "short" }).replace(",", "") + (info.venue && !isTbc(info.venue) ? " · " + info.venue : "");
+      ctx.fillStyle = "#E3EEE7"; ctx.font = '600 30px "' + B + '"';
+      ctx.fillText(foot, pad, S - 66);
+      ctx.textAlign = "right"; ctx.fillStyle = GOLD; ctx.font = '700 30px "' + B + '"';
+      ctx.fillText(SHARE_LINK, S - pad, S - 66);
+      return new Promise(function (resolve) { c.toBlob(resolve, "image/png"); });
+    });
+  }
+  function openGraphic(info) {
+    sheetKind = "graphic";
+    openSheet('<h2 id="sheet-title">Result graphic</h2><p class="hint">Making the picture…</p>', "graphic");
+    drawGraphic(info).then(function (blob) {
+      if (sheetKind !== "graphic" || !blob) return;
+      if (graphicUrl) URL.revokeObjectURL(graphicUrl);
+      graphicUrl = URL.createObjectURL(blob);
+      const name = ("an-gleann-v-" + String(info.opp || "result")).toLowerCase().replace(/[^a-z0-9]+/g, "-") + ".png";
+      graphicFile = null;
+      try { graphicFile = new File([blob], name, { type: "image/png" }); } catch (e) {}
+      const canShare = !!(graphicFile && navigator.canShare && navigator.canShare({ files: [graphicFile] }));
+      openSheet('<h2 id="sheet-title">Result graphic</h2>' +
+        '<img class="gimg" src="' + graphicUrl + '" alt="Result graphic: An Gleann ' + esc(info.us) + " " + esc(info.opp) + " " + esc(info.them) + '">' +
+        '<div class="btnrow">' + (canShare ? '<button type="button" class="pbtn" data-act="gshare">Share</button>' : "") +
+        '<a class="' + (canShare ? "linkbtn" : "pbtn") + '" href="' + graphicUrl + '" download="' + esc(name) + '">Save picture</a>' +
+        '<button type="button" class="linkbtn" data-act="close">Close</button></div>' +
+        '<p class="hint">' + (canShare ? "Share sends it straight to WhatsApp, Facebook, Instagram or Messages." : "Or press and hold the picture to save or share it.") + "</p>", "graphic");
+    }).catch(function () {
+      if (sheetKind === "graphic") openSheet('<h2 id="sheet-title">Result graphic</h2><p class="hint">Couldn\'t make the picture on this device.</p><div class="btnrow"><button type="button" class="linkbtn" data-act="close">Close</button></div>', "graphic");
+    });
   }
 
   /* ---------- render ---------- */
@@ -1095,9 +1324,10 @@
     }
     return key ? { kind: "official", key: key } : { kind: "new" };
   }
-  function addResult(m, events, upd) {
+  function addResult(m, events, upd, subs) {
     const us = gp(tally(events, "glen")), them = gp(tally(events, "opp"));
     const t = resultTarget(m);
+    let rkey = reportKeyFor(m, t);
     if (t.kind === "club") {
       upd["fixtures/" + t.id + "/us"] = us;
       upd["fixtures/" + t.id + "/them"] = them;
@@ -1113,11 +1343,16 @@
       upd["fixtures/" + k] = g;
       upd[m.path + "/gid"] = k;
       upd[m.path + "/autoGid"] = true;
+      rkey = "club-" + k;
     }
+    /* keep the match centre copy (timeline, subs, team sheet) in step with the result */
+    putReport(upd, rkey, m, events, subs);
     return upd;
   }
   function removeResult(m, upd) {
     const t = resultTarget(m);
+    const rkey = reportKeyFor(m, t);
+    if (rkey) { upd["reports/" + rkey] = null; upd["reportKeys/" + rkey] = null; }
     if (t.kind === "club" && m.autoGid) {
       upd["fixtures/" + t.id] = null;
       upd[m.path + "/gid"] = null;
@@ -1143,7 +1378,7 @@
     const r = mref(m, "events").push();
     const upd = {};
     upd[m.path + "/events/" + r.key] = ev;
-    save(liveRef().update(addResult(m, m.events.concat([ev]), upd)), msg + ". Result updated.");
+    save(liveRef().update(addResult(m, m.events.concat([Object.assign({ id: r.key }, ev)]), upd)), msg + ". Result updated.");
   }
   function armed(btn, label) {
     if (btn.dataset.armed === "1") return true;
@@ -1169,6 +1404,22 @@
     const act = b.dataset.act;
     if (act === "close") { closeSheet(); return; }
     if (act === "pickmatch") { state.mid = b.dataset.mid; render(); return; }
+    if (act === "report") { openReport(b.dataset.key); return; }
+    if (act === "graphic") {
+      if (b.dataset.key) { const r = REPORT_CACHE[b.dataset.key]; if (r) openGraphic(graphicInfo(r)); return; }
+      const lm = matchById(b.dataset.mid);
+      if (lm) openGraphic(graphicInfo(lm));
+      return;
+    }
+    if (act === "ggraphic") {
+      const g = allGames().filter(function (x) { return gameReportKey(x) === b.dataset.key && x.us && x.them; })[0];
+      if (g) openGraphic(graphicInfo(g, true));
+      return;
+    }
+    if (act === "gshare") {
+      if (graphicFile && navigator.share) navigator.share({ files: [graphicFile], title: "An Gleann result" }).catch(function () {});
+      return;
+    }
     if (act === "signin") { openSignIn(); return; }
     if (act === "signout") { closeSheet(); auth.signOut(); return; }
     if (act === "forgot") {
@@ -1254,7 +1505,11 @@
     } else if (act === "subopen" && m) openSubSheet(m);
     else if (act === "rmsub" && m) {
       if (!armed(b, "✕")) { toast("Tap the red ✕ again to remove that sub."); return; }
-      save(mref(m, "subs/" + b.dataset.id).remove(), "Sub removed");
+      if (phase(m) !== "ft") { save(mref(m, "subs/" + b.dataset.id).remove(), "Sub removed"); return; }
+      const upd = {};
+      upd[m.path + "/subs/" + b.dataset.id] = null;
+      const keep = m.subs.filter(function (x) { return x.id !== b.dataset.id; });
+      save(liveRef().update(addResult(m, m.events, upd, keep)), "Sub removed");
     } else if (act === "rm" && m) {
       if (!armed(b, "✕")) { toast("Tap the red ✕ again to remove that score."); return; }
       if (phase(m) !== "ft") { save(mref(m, "events/" + b.dataset.id).remove(), "Score removed"); return; }
@@ -1269,7 +1524,11 @@
     } else if (act === "clear" && m) {
       if (!armed(b, "Tap again to clear this game")) return;
       if (state.mid === m.id) state.mid = null;
-      save(mref(m).remove(), "Live game cleared");
+      if (phase(m) !== "ft") { save(mref(m).remove(), "Live game cleared"); return; }
+      const upd = addResult(m, m.events, {});
+      Object.keys(upd).forEach(function (k) { if (k.indexOf(m.path + "/") === 0) delete upd[k]; });
+      upd[m.path] = null;
+      save(liveRef().update(upd), "Live game cleared. It's kept in the match centre on the Results tab.");
     } else if (act === "showsetup") { state.showSetup = true; render(); }
     else if (act === "hidesetup") { state.showSetup = false; render(); }
     else if (act === "setup") {
@@ -1344,7 +1603,11 @@
       if (p === "ht") s.ht = true;
       closeSheet();
       subCtx = null;
-      save(mref(m, "subs").push(s), on.name + " on for " + (cur.name || "No. " + pos));
+      if (p !== "ft") { save(mref(m, "subs").push(s), on.name + " on for " + (cur.name || "No. " + pos)); return; }
+      const sk = mref(m, "subs").push().key;
+      const supd = {};
+      supd[m.path + "/subs/" + sk] = s;
+      save(liveRef().update(addResult(m, m.events, supd, m.subs.concat([Object.assign({ id: sk }, s)]))), on.name + " on for " + (cur.name || "No. " + pos));
     } else if (form.id === "x-form") {
       ev.preventDefault();
       if (!canScore() || !db) return;
@@ -1443,14 +1706,24 @@
           if (was !== online && canScore() && state.tab === "live") render();
         });
         auth.onAuthStateChanged(function (u) { user = u; watchRole(u); render(); });
-        liveRef().on("value", function (snap) {
-          LIVE = normaliseLive(snap.val() || {});
-          const first = liveState !== "ready";
-          liveState = "ready";
-          const today = londonToday();
-          if (first && !tabChosen && LIVE.matches.some(function (m) { return isActive(m) || (m.d === today && !m.clock.ft); })) state.tab = "live";
-          render();
-        }, function () { liveState = "error"; render(); });
+        /* each part of /live is watched on its own, so match reports are only downloaded when someone opens one */
+        const PARTS = ["match", "matches", "lineups", "fixtures", "venues", "results", "reportKeys"];
+        const raw = {};
+        let loaded = 0;
+        PARTS.forEach(function (part) {
+          let firstSnap = true;
+          liveRef(part).on("value", function (snap) {
+            raw[part] = snap.val();
+            if (firstSnap) { firstSnap = false; loaded++; }
+            if (loaded < PARTS.length) return;
+            LIVE = normaliseLive(raw);
+            const first = liveState !== "ready";
+            liveState = "ready";
+            const today = londonToday();
+            if (first && !tabChosen && LIVE.matches.some(function (m) { return isActive(m) || (m.d === today && !m.clock.ft); })) state.tab = "live";
+            render();
+          }, function () { liveState = "error"; render(); });
+        });
       })
       .catch(function () { liveState = "error"; render(); });
   }

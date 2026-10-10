@@ -41,5 +41,6 @@ Database rules (Firebase, Realtime Database, Rules):
 3. Tap **Throw-in** when the game starts, then tap Point (white flag), 2 points (orange flag) or Goal (green flag) for each score and pick the scorer.
    For a substitution, tap **Make a sub**, then who's coming off and who's going on. Subs show in the scores list and on the pitch, and are stored under each game's `subs` (separate from `events`, so they never count towards the score).
 4. Use Half-time, Start 2nd half and Full-time as the game goes on. Every step can be undone, and any score or sub can be removed (tap its ✕ twice).
+5. At full-time the score goes to Results and a copy of the game (timeline, subs, team sheet) is saved under `/live/reports/<key>`, listed in `/live/reportKeys`. On the Results tab that game gets a **Match centre** link; every result can make a square **Result graphic** for sharing.
 
 If the signal drops at the pitch, scores entered on the scorer's phone are kept and sent when it reconnects.
