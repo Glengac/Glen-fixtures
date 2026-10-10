@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:derry.clubandcounty.com)",
+      "WebFetch(domain:derrygaa.ie)",
+      "WebFetch(domain:www.derrygaa.ie)",
+      "WebFetch(domain:ulsterladiesgaelic.com)",
+      "WebFetch(domain:www.ulsterladiesgaelic.com)",
+      "Bash(git *)",
+      "Bash(python3 tools/build_calendars.py)"
+    ]
+  }
+}
