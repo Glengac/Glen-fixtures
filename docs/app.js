@@ -12,7 +12,7 @@
 
   const TZ = "Europe/London";
   /* Matches the ?v= on app.js and styles.css in index.html and the number in version.json; bump all three together */
-  const BUILD = "2026101003";
+  const BUILD = "2026101004";
   const FIREBASE_SDK = "https://www.gstatic.com/firebasejs/10.12.2/";
   const CFG = window.GLEN_FIREBASE || null;
   const OWNER_UID = "huUQRRNXqbQIk0spwd1xrh2rDi43";
@@ -545,7 +545,7 @@
       (g.t ? " at " + esc(g.t) : "") + ". Follow the score here while it's on.";
   }
 
-  /* Club jerseys for the pitch, seen from the back: outfield blue with the gold band, gold shoulder stripes, white collar and cuffs; goalkeeper yellow with a black collar. No sponsor or maker logos. */
+  /* Club jerseys for the pitch, seen from the back: outfield green with the gold band, gold shoulder stripes, white collar and cuffs; goalkeeper yellow with a black collar. No sponsor or maker logos. */
   const JPATH = "M37 5C42 9.5 58 9.5 63 5L80 10L98 33L86 44L78 36L78 91Q50 95 22 91L22 36L14 44L2 33L20 10Z";
   function mirror(pts) { return pts.map(function (p) { return [100 - p[0], p[1]]; }); }
   function poly(pts) { return pts.map(function (p) { return p[0] + " " + p[1]; }).join(" "); }
@@ -556,7 +556,7 @@
     '<defs><clipPath id="jbody"><path d="' + JPATH + '"/></clipPath>' +
     /* outfield: green, gold band across the back, gold shoulder stripes, white collar and cuffs */
     '<symbol id="jer-out" viewBox="0 0 100 96">' +
-    '<path d="' + JPATH + '" fill="#1E5FC4"/>' +
+    '<path d="' + JPATH + '" fill="#2E9E46"/>' +
     '<g clip-path="url(#jbody)">' +
     '<rect x="22" y="39" width="56" height="15" fill="#F2B51F"/>' +
     '<g fill="none" stroke="#F2B51F" stroke-width="2.4" stroke-linejoin="round">' +
@@ -564,7 +564,7 @@
     '<polyline points="' + poly(mirror(STRIPE_L1)) + '"/><polyline points="' + poly(mirror(STRIPE_L2)) + '"/></g>' +
     '<polygon points="' + poly(CUFF_L) + '" fill="#FFFFFF"/><polygon points="' + poly(mirror(CUFF_L)) + '" fill="#FFFFFF"/>' +
     '<path d="M35 3.5C42 12 58 12 65 3.5" fill="none" stroke="#FFFFFF" stroke-width="5"/></g>' +
-    '<path d="' + JPATH + '" fill="none" stroke="#0A2A5E" stroke-width="2.2" stroke-linejoin="round"/></symbol>' +
+    '<path d="' + JPATH + '" fill="none" stroke="#08361C" stroke-width="2.2" stroke-linejoin="round"/></symbol>' +
     /* goalkeeper: yellow with a black band round the collar */
     '<symbol id="jer-gk" viewBox="0 0 100 96">' +
     '<path d="' + JPATH + '" fill="#F7D21B"/>' +
