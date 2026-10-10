@@ -44,3 +44,7 @@ Database rules (Firebase, Realtime Database, Rules):
 5. At full-time the score goes to Results and a copy of the game (timeline, subs, team sheet) is saved under `/live/reports/<key>`, listed in `/live/reportKeys`. On the Results tab that game gets a **Match centre** link; every result can make a square **Result graphic** for sharing.
 
 If the signal drops at the pitch, scores entered on the scorer's phone are kept and sent when it reconnects.
+
+## Releasing a change
+
+Bump the version number in three places together: `?v=` on `app.js` and `styles.css` in `docs/index.html`, `BUILD` in `docs/app.js`, and `docs/version.json`. Open copies of the site check `version.json` when they load or come back to the screen, and reload onto the new version by themselves.

@@ -11,6 +11,8 @@
   "use strict";
 
   const TZ = "Europe/London";
+  /* Matches the ?v= on app.js and styles.css in index.html and the number in version.json; bump all three together */
+  const BUILD = "2026101003";
   const FIREBASE_SDK = "https://www.gstatic.com/firebasejs/10.12.2/";
   const CFG = window.GLEN_FIREBASE || null;
   const OWNER_UID = "huUQRRNXqbQIk0spwd1xrh2rDi43";
@@ -1670,6 +1672,23 @@
     }
   });
   document.addEventListener("keydown", function (ev) { if (ev.key === "Escape" && !sheet.hidden) closeSheet(); });
+
+  /* Pick up site updates by themselves: phones and Home Screen apps can hold an old copy for a while.
+     Reload onto the new version (a new address, so no cached page is reused), but never mid-form or while offline. */
+  function checkForUpdate() {
+    if (!window.fetch) return;
+    fetch("version.json?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
+      if (!j || !j.v || j.v === BUILD || !online || !sheet.hidden) return;
+      try {
+        const flag = "glen-updated-" + j.v;
+        if (sessionStorage.getItem(flag)) return;
+        sessionStorage.setItem(flag, "1");
+      } catch (e) { return; }
+      location.replace(location.pathname + "?v=" + encodeURIComponent(j.v) + location.hash);
+    }).catch(function () {});
+  }
+  setTimeout(checkForUpdate, 3000);
+  document.addEventListener("visibilitychange", function () { if (document.visibilityState === "visible") checkForUpdate(); });
 
   /* ---------- boot: fixtures ---------- */
   fetch("fixtures.json?v=" + Date.now(), { cache: "no-store" }).then(function (r) {
