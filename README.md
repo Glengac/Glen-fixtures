@@ -38,6 +38,7 @@ Database rules (Firebase, Realtime Database, Rules):
 
 1. Open the site, tap **Scorer sign-in** at the bottom, and sign in.
 2. On the **Live** tab, pick the game, name the team, then tap **Set up live game**. To run another game at the same time, tap **Start another live game**; each game gets its own tab.
+   In **Edit team sheet**, name up to 30 players (squad numbers 1–30) and pick who starts in each of the 15 positions. Each player keeps his own number wherever he plays; picking someone who already starts swaps the two, and everyone not starting is on the bench. Stored under `/live/lineups/<team>` as `n1`–`n30` (names) and `p1`–`p15` (the squad number starting in that position, left out when it's the same number).
 3. Tap **Throw-in** when the game starts, then tap Point (white flag), 2 points (orange flag) or Goal (green flag) for each score and pick the scorer.
    For a substitution, tap **Make a sub**, then who's coming off and who's going on. Subs show in the scores list and on the pitch, and are stored under each game's `subs` (separate from `events`, so they never count towards the score).
 4. Use Half-time, Start 2nd half and Full-time as the game goes on. Every step can be undone, and any score or sub can be removed (tap its ✕ twice).

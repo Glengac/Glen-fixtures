@@ -12,7 +12,7 @@
 
   const TZ = "Europe/London";
   /* Matches the ?v= on app.js and styles.css in index.html and the number in version.json; bump all three together */
-  const BUILD = "2026101004";
+  const BUILD = "2026101005";
   const FIREBASE_SDK = "https://www.gstatic.com/firebasejs/10.12.2/";
   const CFG = window.GLEN_FIREBASE || null;
   const OWNER_UID = "huUQRRNXqbQIk0spwd1xrh2rDi43";
@@ -67,7 +67,9 @@
     { n: 14, pos: "Full-forward",         x: 50, y: 81 },
     { n: 15, pos: "Left corner-forward",  x: 83, y: 81 }
   ];
-  const SUB_NUMBERS = [16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26];
+  /* Squad numbers 1-30: each player keeps his number wherever he starts */
+  const SQUAD_SIZE = 30;
+  const SQUAD = Array.from({ length: SQUAD_SIZE }, function (_, i) { return i + 1; });
   /* Substitution icon: green arrow on, red arrow off */
   const SUB_SVG = '<svg class="subi" viewBox="0 0 24 24" aria-hidden="true"><path class="up" d="M8 20V5M3.5 9.5 8 5l4.5 4.5"/><path class="dn" d="M16 4v15m-4.5-4.5L16 19l4.5-4.5"/></svg>';
 
@@ -227,14 +229,21 @@
     });
     return out;
   }
-  function lineupFor(team) { return (LIVE.lineups && LIVE.lineups[team]) || {}; }
+  function lineupFor(team) { return (LIVE.lineups && LIVE.lineups[team]) || { names: {}, start: {} }; }
+  /* squad number starting in position pos (1-15); the same number unless the team sheet says otherwise */
+  function startNo(lu, pos) { return (lu.start && lu.start[pos]) || pos; }
   function byAt(a, b) { return (a.at || 0) - (b.at || 0); }
-  /* Who's on the pitch now: the team sheet with this game's subs applied in order.
-     field: position 1-15 -> { name, no, sub }; spare: everyone who could come on (unused subs, then players taken off) */
+  /* Who's on the pitch now: the starting 15 with this game's subs applied in order.
+     field: position 1-15 -> { name, no, sub }; spare: everyone who could come on (squad not starting, then players taken off) */
   function lineupNow(m) {
-    const lu = m.lineup ? readLineups({ t: m.lineup }).t : lineupFor(m.team);
-    const field = {};
-    POS.forEach(function (p) { field[p.n] = { name: lu[p.n] || "", no: p.n }; });
+    const lu = m.lineup ? readLineup(m.lineup) : lineupFor(m.team);
+    const names = lu.names || {};
+    const field = {}, starting = {};
+    POS.forEach(function (p) {
+      const no = startNo(lu, p.n);
+      starting[no] = true;
+      field[p.n] = { name: names[no] || "", no: no };
+    });
     const offAt = {};
     (m.subs || []).slice().sort(byAt).forEach(function (s) {
       const cur = field[s.pos];
@@ -246,9 +255,9 @@
     const onNow = {};
     POS.forEach(function (p) { if (field[p.n].name) onNow[field[p.n].name] = true; });
     const spare = [], seen = {};
-    SUB_NUMBERS.forEach(function (n) {
-      const name = lu[n];
-      if (!name || onNow[name] || seen[name] || offAt[name]) return;
+    SQUAD.forEach(function (n) {
+      const name = names[n];
+      if (!name || starting[n] || onNow[name] || seen[name] || offAt[name]) return;
       seen[name] = true;
       spare.push({ name: name, no: n });
     });
@@ -292,15 +301,22 @@
       .filter(function (g) { return g.d && g.opp && g.team; });
     return { lineups: readLineups(v.lineups), matches: matches, extra: extra, venues: v.venues || {}, results: v.results || {}, reportKeys: v.reportKeys || {} };
   }
+  /* Team sheets are stored as n1..n30 = squad names and p1..p15 = squad number starting in that position
+     (left out when it's the same number, so older sheets with just n1..n26 still read the same) */
   function readLineups(raw) {
     const out = {};
-    Object.keys(raw || {}).forEach(function (team) {
-      const src = raw[team] || {};
-      const lu = {};
-      Object.keys(src).forEach(function (k) { const n = k.replace(/^n/, ""); if (src[k]) lu[n] = src[k]; });
-      out[team] = lu;
-    });
+    Object.keys(raw || {}).forEach(function (team) { out[team] = readLineup(raw[team]); });
     return out;
+  }
+  function readLineup(src) {
+    const lu = { names: {}, start: {} };
+    Object.keys(src || {}).forEach(function (k) {
+      const mt = /^([np]?)(\d+)$/.exec(k);
+      if (!mt || !src[k]) return;
+      if (mt[1] === "p") { const no = +src[k]; if (no >= 1 && no <= SQUAD_SIZE) lu.start[mt[2]] = no; }
+      else lu.names[mt[2]] = String(src[k]);
+    });
+    return lu;
   }
   function matchById(id) { return LIVE.matches.filter(function (m) { return m.id === id; })[0] || null; }
   function phaseRank(m) { return { "1h": 0, "2h": 0, ht: 0, pre: 1, ft: 2 }[phase(m)]; }
@@ -778,8 +794,9 @@
     return o;
   }
   function lineupToStore(lu) {
-    const o = {};
-    Object.keys(lu || {}).forEach(function (k) { if (lu[k]) o["n" + k] = lu[k]; });
+    const o = {}, names = (lu && lu.names) || {}, start = (lu && lu.start) || {};
+    Object.keys(names).forEach(function (k) { if (names[k]) o["n" + k] = names[k]; });
+    Object.keys(start).forEach(function (k) { if (start[k] && +start[k] !== +k) o["p" + k] = +start[k]; });
     return o;
   }
   function reportOf(m, events, subs) {
@@ -1160,18 +1177,53 @@
       '<button type="button" class="linkbtn" data-act="close">Cancel</button></div>' +
       "</form>");
   }
+  /* Team sheet: pick the starting 15 from the squad, then name the squad (1-30). Numbers stay with the player. */
+  function squadLabel(no, name) { return no + (name ? " · " + name : ""); }
   function openTeamSheet(team) {
     const lu = lineupFor(team);
-    const row = function (n, label) {
-      return '<div class="tsrow"><b>' + n + '</b><label for="ts-' + n + '">' + esc(label) + "</label>" +
-        '<input id="ts-' + n + '" autocomplete="off" value="' + esc(lu[n] || "") + '"></div>';
-    };
+    const names = lu.names || {};
+    const starts = POS.map(function (p) {
+      const cur = startNo(lu, p.n);
+      const opts = SQUAD.map(function (n) {
+        return '<option value="' + n + '"' + (n === cur ? " selected" : "") + ">" + esc(squadLabel(n, names[n])) + "</option>";
+      }).join("");
+      return '<div class="tsrow st"><label for="tp-' + p.n + '">' + esc(p.pos) + "</label>" +
+        '<select id="tp-' + p.n + '" data-pos="' + p.n + '" data-cur="' + cur + '">' + opts + "</select></div>";
+    }).join("");
+    const squad = SQUAD.map(function (n) {
+      return '<div class="tsrow"><b aria-hidden="true">' + n + "</b>" +
+        '<input id="ts-' + n + '" data-no="' + n + '" autocomplete="off" aria-label="Number ' + n + ' name" value="' + esc(names[n] || "") + '"></div>';
+    }).join("");
     openSheet('<h2 id="sheet-title">Team sheet · ' + esc(teamName(team)) + "</h2>" +
       '<form id="ts-form" data-team="' + esc(team) + '" class="tsgrid">' +
-      POS.map(function (p) { return row(p.n, p.pos); }).join("") +
-      "<h3>Subs</h3>" + SUB_NUMBERS.map(function (n) { return row(n, "Sub"); }).join("") +
+      "<h3>Starting 15</h3>" +
+      '<p class="hint">Pick who starts in each position. Each player keeps his own number; picking someone already starting swaps the two.</p>' +
+      '<div class="tsstart">' + starts + "</div>" +
+      '<p class="hint tsnote" id="ts-note" aria-live="polite"></p>' +
+      '<div class="btnrow"><button type="button" class="linkbtn" data-act="ts-reset">Start numbers 1 to 15</button></div>' +
+      "<h3>Squad</h3>" +
+      '<p class="hint">Name up to 30 players. Anyone not in the starting 15 is on the bench.</p>' +
+      '<div class="tssquad">' + squad + "</div>" +
+      '<p class="err" id="ts-err" hidden></p>' +
       '<div class="btnrow"><button type="submit" class="pbtn">Save team sheet</button><button type="button" class="linkbtn" data-act="close">Cancel</button></div>' +
       "</form>");
+  }
+  /* picking a number that already starts elsewhere swaps the two positions */
+  function tsPick(sel) {
+    const no = +sel.value, was = +sel.dataset.cur;
+    const note = $("#ts-note");
+    let other = null;
+    document.querySelectorAll("#ts-form .tsstart select").forEach(function (x) { if (x !== sel && +x.value === no) other = x; });
+    if (other) {
+      other.value = String(was);
+      other.dataset.cur = String(was);
+      const pos = POS.filter(function (p) { return p.n === +other.dataset.pos; })[0];
+      const nm = ($("#ts-" + was) || {}).value || "";
+      const msg = "Swapped: No. " + was + (nm.trim() ? " " + nm.trim() : "") + " now starts at " + (pos ? pos.pos.toLowerCase() : "No. " + other.dataset.pos) + ".";
+      if (note) note.textContent = msg;
+      toast(msg);
+    } else if (note) note.textContent = "";
+    sel.dataset.cur = String(no);
   }
 
   /* ---------- manage scorers (club admin only) ---------- */
@@ -1405,6 +1457,12 @@
     if (!b) return;
     const act = b.dataset.act;
     if (act === "close") { closeSheet(); return; }
+    if (act === "ts-reset") {
+      document.querySelectorAll("#ts-form .tsstart select").forEach(function (x) { x.value = x.dataset.pos; x.dataset.cur = x.dataset.pos; });
+      const note = $("#ts-note");
+      if (note) note.textContent = "Numbers 1 to 15 start.";
+      return;
+    }
     if (act === "pickmatch") { state.mid = b.dataset.mid; render(); return; }
     if (act === "report") { openReport(b.dataset.key); return; }
     if (act === "graphic") {
@@ -1562,12 +1620,19 @@
       render();
     } else if (ev.target.id === "setup-fixture") {
       $("#setup-other").hidden = ev.target.value !== "other";
+    } else if (ev.target.matches("#ts-form .tsstart select")) {
+      tsPick(ev.target);
     }
   });
   document.addEventListener("input", function (ev) {
     /* typing a name for the player going on replaces any bench player tapped */
     if (ev.target.id === "sub-name" && ev.target.value) {
       document.querySelectorAll("#sub-on button").forEach(function (x) { x.setAttribute("aria-pressed", "false"); });
+    }
+    /* squad names show in the starting-15 lists as they're typed */
+    if (ev.target.matches("#ts-form .tssquad input")) {
+      const no = ev.target.dataset.no, label = squadLabel(no, ev.target.value.trim());
+      document.querySelectorAll('#ts-form .tsstart option[value="' + no + '"]').forEach(function (o) { o.textContent = label; });
     }
   });
   document.addEventListener("submit", function (ev) {
@@ -1640,13 +1705,21 @@
       ev.preventDefault();
       if (!canScore() || !db) return;
       const team = form.dataset.team;
-      const lu = {};
-      POS.map(function (p) { return p.n; }).concat(SUB_NUMBERS).forEach(function (n) {
+      const lu = {}, used = {};
+      SQUAD.forEach(function (n) {
         const v = (form.querySelector("#ts-" + n).value || "").trim();
         if (v) lu["n" + n] = v.slice(0, 40);
       });
+      let twice = 0;
+      POS.forEach(function (p) {
+        const no = +form.querySelector("#tp-" + p.n).value || p.n;
+        if (used[no]) twice = twice || no;
+        used[no] = true;
+        if (no !== p.n) lu["p" + p.n] = no;
+      });
+      if (twice) return fail("ts-err", "No. " + twice + " is picked for two positions. Pick someone else for one of them.");
       closeSheet();
-      /* stored as n1..n26 so Firebase keeps it as an object */
+      /* stored as n1..n30 (names) and p1..p15 (who starts where) so Firebase keeps it as an object */
       save(liveRef("lineups/" + team).set(lu), "Team sheet saved");
     } else if (form.id === "s-form") {
       ev.preventDefault();

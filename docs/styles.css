@@ -387,6 +387,20 @@ button:disabled { opacity: 0.5; cursor: default; }
 .tsrow b { font-family: var(--display); font-weight: 800; font-size: 1.15rem; color: var(--green); text-align: right; font-variant-numeric: tabular-nums; }
 .tsrow label { font-size: 0.8rem; color: var(--muted); font-weight: 600; }
 .tsrow input { grid-column: 2; }
+.tsstart, .tssquad { display: grid; gap: 8px; }
+.tsrow.st { grid-template-columns: minmax(7.5rem, 0.8fr) minmax(0, 1.2fr); }
+.tsrow.st label { color: var(--ink); font-size: 0.86rem; }
+.tsrow select {
+  font: inherit; color: var(--ink); background: var(--bg);
+  border: 1px solid var(--line); border-radius: 10px;
+  padding: 9px 10px; width: 100%; min-width: 0;
+}
+.tssquad input { padding: 8px 10px; }
+.tsnote:empty { display: none; }
+.tsnote { margin: 0; color: var(--green); font-weight: 600; }
+@media (min-width: 560px) {
+  .tssquad { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 16px; }
+}
 .toast {
   position: fixed; left: 50%; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%);
   background: var(--ink); color: var(--bg);
