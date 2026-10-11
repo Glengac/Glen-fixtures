@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-11T14:47:14+01:00",
+ "updated": "2026-10-11T19:23:27+01:00",
  "teams": [
   {
    "id": "sf",
@@ -85,6 +85,17 @@
    "st": "fixture"
   },
   {
+   "d": "2026-10-22",
+   "t": "19:00",
+   "team": "u16f",
+   "comp": "B A Mullan Farms U16A2 Football Championship",
+   "round": "Final",
+   "opp": "Glenullin",
+   "venue": "TBC",
+   "ha": "N",
+   "st": "fixture"
+  },
+  {
    "d": "2026-10-11",
    "t": "16:00",
    "team": "sf",
@@ -93,7 +104,9 @@
    "opp": "Newbridge",
    "venue": "Owenbeg",
    "ha": "N",
-   "st": "fixture"
+   "st": "result",
+   "us": "1-10",
+   "them": "2-16"
   },
   {
    "d": "2026-10-08",
