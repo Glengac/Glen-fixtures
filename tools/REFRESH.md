@@ -35,6 +35,7 @@ b. Ulster LGFA (provincial ladies club championships): https://ulsterladiesgaeli
   - mf Minor Football: O'Neills U18 championships and U18 football leagues.
   - u16f U16 Football: B A Mullan Farms U16 championships, U16 Football League.
   - u14a U14 Football A: HSF Group U14A1 (An Gleann) and U14 League Div 1A. u14b U14 Football B: Glen B, U14A1B, U14 League Div 1B. u14c U14 Football C: Glen C, U14C, U14 League Div 3.
+  - u13d U13 Development League: any U13 Development League (An Gleann or Glen teams).
   - int Intermediate Ladies: Derry "Intermediate Championship" and "Intermediate Final", and Ulster LGFA Intermediate Club Championship.
   - mlf Minor Ladies: Derry generic "MINOR Championship" (write comp as "Minor Championship") and Ulster LGFA Minor Club Championship.
   - u16l U16 Ladies: Derry generic "U16 Championship" with Cup/Shield divisions.
