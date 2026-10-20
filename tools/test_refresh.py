@@ -148,9 +148,11 @@ def main():
                 "<h4><a href='https://ulsterladiesgaelic.com/league/219943'>24/10/2026</a></h4>"
                 "<ul><li>24 Oct 2026</li><li>14:00</li><li>Naomh Padraig (Donegal)</li><li>V</li><li>Mayobridge (Down)</li>"
                 "<li>Donegal</li><li><a href='#'>More</a></li></ul></body></html>")
-    lgfa_res = ("<html><body><h4><a href='https://ulsterladiesgaelic.com/league/219943'>Intermediate Club</a></h4>"
-                "<ul><li>11 Oct 2026</li><li>11:30</li><li>Burren (Down)</li><li>4-9</li><li>1-4</li>"
-                "<li>Watty Grahams Glen (Derry)</li><li>Burren</li></ul></body></html>")
+    # laid out as on the live results page: "4 - 9 V  1 - 4" in one line, venue given as a county
+    lgfa_res = ("<html><body><h3>Ulster Intermediate Club Championship 2026</h3>"
+                "<h4><a href='https://ulsterladiesgaelic.com/league/219943'>11/10/2026</a></h4>"
+                "<ul><li>11 Oct 2026</li><li>11:30</li><li>Burren (Down)</li><li>4 - 9 V  1 - 4</li>"
+                "<li>Watty Grahams Glen (Derry)</li><li>Down</li></ul></body></html>")
     p, out = run(copy.deepcopy(orig), {"derry": page(derry_games), "lgfa-fixtures": lgfa_fix, "lgfa-results": lgfa_res})
     assert p.returncode == 0, p.stderr + p.stdout
     lg = next(g for g in out["games"] if g["d"] == "2026-11-01")

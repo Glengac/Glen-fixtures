@@ -259,9 +259,20 @@ def parse_lgfa(html: str) -> list[dict]:
                 grade = g.group(1).title()
         if kind != "date":
             continue
-        # look ahead a few tokens for: [time] team1 (V | s1 s2) team2 [venue]
+        # look ahead a few tokens for: [time] team1 (V | s1 s2 | s1 V s2) team2 [venue]
         window = flat[idx + 1: idx + 10]
-        texts = [w[1] for w in window if w[0] != "date"]
+        texts = []
+        for w in window:
+            if w[0] == "date":
+                continue
+            both = re.fullmatch(r"(\d{1,2})\s*-\s*(\d{1,3})\s*[Vv]\s*(\d{1,2})\s*-\s*(\d{1,3})", w[1])
+            one = re.fullmatch(r"(\d{1,2})\s*-\s*(\d{1,3})", w[1])
+            if both:
+                texts += [f"{both.group(1)}-{both.group(2)}", "V", f"{both.group(3)}-{both.group(4)}"]
+            elif one:
+                texts.append(f"{one.group(1)}-{one.group(2)}")
+            else:
+                texts.append(w[1])
         if not texts:
             continue
         j = 0
@@ -679,7 +690,8 @@ def annotate(title: str, lines: list[str]) -> None:
         return
     body = "\n".join(lines) or "(nothing)"
     body = body.replace("%", "%25").replace("\r", "").replace("\n", "%0A")
-    print(f"::notice title={title}::{body[:60000]}")
+    safe_title = title.replace(",", " -").replace(":", " ")
+    print(f"::notice title={safe_title}::{body[:60000]}")
     summ = os.environ.get("GITHUB_STEP_SUMMARY")
     if summ:
         with open(summ, "a", encoding="utf-8") as fh:
