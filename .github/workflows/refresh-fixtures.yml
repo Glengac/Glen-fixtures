@@ -1,0 +1,69 @@
+name: Refresh fixtures
+
+# Reads An Gleann fixtures & results from Derry GAA (Club & County) and Ulster LGFA,
+# merges them into docs/fixtures.json, rebuilds docs/cal/*.ics and pushes to main.
+# GitHub Pages then republishes the site. See tools/REFRESH.md.
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Check only, don't save"
+        type: boolean
+        default: false
+  push:
+    branches: [main]
+    paths:
+      - tools/refresh_fixtures.py
+      - .github/workflows/refresh-fixtures.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh-fixtures
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install
+        run: pip install --quiet requests beautifulsoup4
+
+      - name: Fetch and merge
+        id: refresh
+        env:
+          DRY: ${{ (github.event_name == 'workflow_dispatch' && inputs.dry_run) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[dry-run]')) }}
+        run: |
+          if [ "$DRY" = "true" ]; then
+            python tools/refresh_fixtures.py --dry-run
+          else
+            python tools/refresh_fixtures.py
+          fi
+
+      - name: Commit and push
+        if: steps.refresh.outputs.message != ''
+        env:
+          MSG: ${{ steps.refresh.outputs.message }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/fixtures.json docs/cal
+          if git diff --cached --quiet; then
+            echo "Nothing to save."
+            exit 0
+          fi
+          git commit -q -m "$MSG"
+          for attempt in 1 2 3; do
+            git pull -q --rebase origin main && git push -q origin HEAD:main && exit 0
+            sleep 5
+          done
+          echo "::error::Could not push the refreshed fixtures"
+          exit 1
