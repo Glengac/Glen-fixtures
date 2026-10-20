@@ -3,7 +3,7 @@
 Fixtures, results and live scores for every Watty Graham's GAC An Gleann team.
 
 - **Website files** are in `docs/` and are served by GitHub Pages (Settings > Pages > Deploy from a branch > `main` / `docs`).
-- **Fixtures and results** live in `docs/fixtures.json`. A scheduled Claude task refreshes it every two hours (8am to midnight) from Derry GAA and Ulster LGFA.
+- **Fixtures and results** live in `docs/fixtures.json`. The **Refresh fixtures** GitHub Action updates it from Derry GAA and Ulster LGFA every 2 hours on weekdays and every 30 minutes Friday to Sunday (8am to midnight); see `tools/REFRESH.md`.
 - **Team calendars** (`docs/cal/*.ics`) are rebuilt from the fixtures with `python3 tools/build_calendars.py`. People subscribe to them from the Fixtures tab, and their calendar keeps itself up to date.
 - **Live scores, team sheets, club-added games and venues set for TBC games** are stored in Firebase Realtime Database under `/live`. Anyone can read them; only admins and the logins listed under `/scorers` can change them. Several games can be live at once (`/live/matches`). The Firebase settings go in `docs/firebase-config.js`.
 - **Club teams**: scorers can add their own teams (for games Derry GAA and Ulster LGFA don't list) with **Club teams** on the Fixtures tab, or **+ New team…** when adding a game. They're stored in Firebase under `/live/teams/<id>` as `{ name, group }` and appear in the team picker after the teams in `fixtures.json`. A club team can be renamed, and removed once it has no games. Club teams don't get a subscribable calendar.

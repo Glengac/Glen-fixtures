@@ -4,6 +4,9 @@ name: Refresh fixtures
 # merges them into docs/fixtures.json, rebuilds docs/cal/*.ics and pushes to main.
 # GitHub Pages then republishes the site. See tools/REFRESH.md.
 on:
+  schedule:
+    - cron: "7 7-23/2 * * 1-4"       # Mon–Thu: every 2 hours, 8am–midnight (BST)
+    - cron: "7,37 7-23 * * 0,5,6"    # Fri–Sun: every 30 minutes, 8am–midnight (BST)
   workflow_dispatch:
     inputs:
       dry_run:
