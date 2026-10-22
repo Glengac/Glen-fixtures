@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-22T22:28:22+01:00",
+ "updated": "2026-10-23T00:26:29+01:00",
  "teams": [
   {
    "id": "sf",
@@ -87,7 +87,9 @@
    "opp": "Glenullin",
    "venue": "Ballerin",
    "ha": "N",
-   "st": "fixture"
+   "st": "result",
+   "us": "4-3",
+   "them": "0-14"
   },
   {
    "d": "2026-10-11",
